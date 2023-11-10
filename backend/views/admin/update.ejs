@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    <h1>編輯系統管理員</h1>
+    <h2><%= errorMessage %></h2>
+
+    <form method="POST" action="/update_admin/<%= admin.admin_id %>">
+        <div>姓名:<input type="text" name="admin_full_name" value="<%= admin.admin_full_name %>" placeholder="請輸入管理員名稱" /></div>
+    <div>帳號:<input type="text" name="admin_name" value="<%= admin.admin_name %>" placeholder="請輸入帳號" /></div>
+    <div>密碼:<input type="password" name="admin_password" value="<%= admin.admin_password %>" placeholder="請輸入密碼" /></div>
+    <div>信箱:<input type="text" name="admin_email" value="<%= admin.admin_email %>" placeholder="請輸入信箱" /></div>
+    <div>權限:
+        <select name="admin_permission_level">
+            <option value="" disabled>請選擇權限</option>
+            <option value="Super" <% if (admin.admin_permission_level === 'Super') { %>selected<% } %>>Super</option>
+            <option value="Basic" <% if (admin.admin_permission_level === 'Basic') { %>selected<% } %>>Basic</option>
+        </select>
+    </div>
+    <div>狀態:
+        <input type="radio" name="admin_disabled" value="0" id="enabled" <% if (admin.admin_disabled === 0) { %>checked<% } %>>
+        <label for="enabled">啟用</label>
+
+        <input type="radio" name="admin_disabled" value="1" id="disabled" <% if (admin.admin_disabled === 1) { %>checked<% } %>>
+        <label for="disabled">停權</label>
+    </div>
+
+    <input type="submit" class="btn btn-outline-success" />
+    <a class="btn btn-outline-secondary" href="/list">取消</a>
+    </form>
+
+    <script>
+        
+    </script>
+</body>
+</html>

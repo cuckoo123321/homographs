@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    
+    <a class="btn btn-primary" href="/add">新增管理員</a>
+    <a class="btn btn-primary" href="/list">顯示所有列表</a>
+
+    <form class="d-flex" role="search"  method="GET" action="/search">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="請輸入姓名、帳號、信箱關鍵字" aria-label="Search" name="keyword">
+            <button class="btn btn-primary" type="submit" id="button-addon2">查詢</button>
+        </div>
+    </form>
+
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+              <th>序號</th>
+              <th>姓名</th>
+              <th>帳號</th>
+              <th>信箱</th>
+              <th>           
+                <!-- 權限下拉選單 -->
+                <div class="dropdown">
+                    <button class="dropdown-toggle" type="button" id="permissionDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        權限
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="permissionDropdown">
+                        <a class="dropdown-item permission" href="#" data-permission="all">全部</a>
+                        <a class="dropdown-item permission" href="#" data-permission="Super">Super</a>
+                        <a class="dropdown-item permission" href="#" data-permission="Basic">Basic</a>
+                    </div>
+                </div>
+              </th>
+              <th>
+                <!-- 狀態下拉選單 -->
+                <div class="dropdown">
+                    <button class="dropdown-toggle" type="button" id="statusDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        狀態
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="statusDropdown">
+                        <a class="dropdown-item status" href="#" data-status="all">全部</a>
+                        <a class="dropdown-item status" href="#" data-status="啟用">啟用</a>
+                        <a class="dropdown-item status" href="#" data-status="停權">停權</a>
+                    </div>
+                </div>
+              </th>
+              <th>                
+                 <!-- 創建時間下拉選單 -->
+                 <div class="dropdown">
+                    <button class="dropdown-toggle" type="button" id="createdAtDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        創建時間
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="createdAtDropdown">
+                        <a class="dropdown-item createdAt" href="#" data-status="all">全部</a>
+                        <a class="dropdown-item createdAt" href="#" data-status="week">近一週</a>
+                        <a class="dropdown-item createdAt" href="#" data-status="month">近一個月</a>
+                        <a class="dropdown-item createdAt" href="#" data-status="year">近一年</a>
+                    </div>
+                </div>
+              </th>
+              <th>更新時間</th>
+              <th></th>
+              <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% let i = 1; %>
+            <% admin.forEach(function(admin) { %>
+                <tr class="createdRow" data-created-at="<%= admin.admin_created_at %>">
+                    <td><%= i++ %></td>
+                    <td><%= admin.admin_full_name %></td>
+                    <td><%= admin.admin_name %></td>
+                    <td><%= admin.admin_email %></td>
+                    <td><%= admin.admin_permission_level %></td>
+                    <td style="color: <%= admin.admin_disabled ? 'red' : 'green' %>;">
+                        <%= admin.admin_disabled ? '停權' : '啟用' %>
+                    </td>
+
+                    
+                    <% let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }; %>
+
+                    <% let createdAt = admin.admin_created_at; %>
+                    <% let formattedCreatedDate = createdAt.toLocaleString('zh-TW', options); %>
+                    <td><%= formattedCreatedDate %></td>                     
+
+                    <% let UpdatedDate = admin.admin_updated_at; %>                    
+                    <% let formattedUpdatedDate = UpdatedDate.toLocaleString('zh-TW', options); %>
+                    <td><%= formattedUpdatedDate %></td>
+                    
+                                      
+                    <td>
+                        <a class="btn btn-outline-info" href="/update_admin/<%= admin.admin_id %>">編輯</a>
+                    </td>  
+                    <td>
+                        <a class="btn btn-outline-danger" href="/delete_admin/<%= admin.admin_id %>" onclick="return confirmDelete();">刪除</a>
+                   </td>   
+                    
+                      
+                </tr>
+            <% }); %>
+          </tbody>
+    </table>
+
+    <script>
+        // alert delete
+       function confirmDelete() {
+            return confirm('確定要刪除此管理員嗎？');
+        }
+
+        // 權限篩選
+        $('.dropdown-item.permission').click(function(){
+            const selectedPermission = $(this).data('permission');
+            applyFilters(selectedPermission);
+        });
+
+        // 狀態篩選
+        $('.dropdown-item.status').click(function(){
+            const selectedStatus = $(this).data('status');
+            applyFilters(selectedStatus);
+        });
+
+        function applyFilters(selectedValue) {
+            // 先隱藏所有行
+            $('table tbody tr').hide();
+
+            if (selectedValue === 'all') {
+                // 顯示所有行
+                $('table tbody tr').show();
+            } else {
+                // 顯示符合篩選條件的行
+                $(`table tbody tr td:contains("${selectedValue}")`).parent().show();
+            }
+        }
+
+        // 創建時間篩選
+        $('.createdAt').click(function () {
+            const selectedStatus = $(this).data('status');
+
+            // 隱藏或顯示符合篩選的行
+            if (selectedStatus === 'all') {
+                $('.createdRow').show(); // 顯示所有行
+            } else {
+                $('.createdRow').hide(); // 隱藏所有行
+                const cutoffDate = new Date();
+
+                // 根據所選擇的篩選條件計算截止日期
+                switch (selectedStatus) {
+                    case 'week':
+                        cutoffDate.setDate(cutoffDate.getDate() - 7);
+                        break;
+                    case 'month':
+                        cutoffDate.setMonth(cutoffDate.getMonth() - 1);
+                        break;
+                    case 'year':
+                        cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
+                        break;
+                }
+
+                // 顯示符合篩選條件的行
+                $('.createdRow').filter(function () {
+                    const createdAt = new Date($(this).data('created-at'));
+                    return createdAt >= cutoffDate;
+                }).show();
+            }
+        });
+
+
+    </script>
+</body>
+</html>

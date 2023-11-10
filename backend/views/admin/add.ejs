@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    <h2>新增系統管理員</h2>
+    <h2><%= errorMessage %></h2>
+
+    <form method="POST" action="/add" data-bitwarden-watching="1">
+            <div class="form-group">
+                <label for="" class="form-label mt-4">姓名：</label>
+                <input name="admin_full_name" type="text" class="form-control" placeholder="請輸入管理員名稱">
+            </div>
+            <div class="form-group">
+                <label for="" class="form-label mt-4">帳號：</label>
+                <input name="admin_name" type="text" class="form-control" placeholder="請輸入帳號">
+            </div>
+            <div class="form-group">
+                <label for="" class="form-label mt-4">密碼：</label>
+                <input name="admin_password" type="password" class="form-control" placeholder="請輸入管理員密碼">
+            </div>
+            <div class="form-group">
+                <label for="" class="form-label mt-4">信箱：</label>
+                <input name="admin_email" type="email" class="form-control" placeholder="請輸入管理員信箱">
+            </div>
+            <div class="form-group">
+                <label for="" class="form-label mt-4">權限:</label>
+                <select class="form-select" name="admin_permission_level">
+                    <option value="" disabled selected>請選擇權限</option>
+                    <option value="Super">Super</option>
+                    <option value="Basic">Basic</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="" class="form-label mt-4">狀態：</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="admin_disabled" value="0" id="enabled">
+                    <label class="form-check-label" for="optionsRadios2">
+                      啟用
+                    </label>
+                  </div>   
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="admin_disabled" value="1" id="disabled">
+                  <label class="form-check-label" for="optionsRadios2">
+                    停權
+                  </label>
+                </div>                
+            </div>        
+        <input type="submit" class="btn btn btn-success"/>
+        <button type="button" class="btn btn-warning" id="clearButton">清空</button>
+        <a class="btn btn-secondary" href="/list">取消</a>
+        
+    </form>
+
+    <script>
+        //清空欄位
+        $(document).ready(function(){
+            $('#clearButton').click(function(){
+                $('form').find(':input').not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
+            })
+        })
+
+        //把資料存進 localStorage
+        $(document).ready(function(){
+            const formData = JSON.parse(localStorage.getItem('formData')) || {};
+            //把儲存的資料填進表單，但要排除密碼
+            for(const key in formData){
+                if(formData.hasOwnProperty(key) && key !== 'admin_password'){
+                    if(key === 'admin_disabled'){
+                        $(`[name="${key}"][value="${formData[key]}"]`).prop('checked', true);
+                    }else{
+                        $(`[name="${key}"]`).val(formData[key]);
+                    }                    
+                }
+            }
+            //把 input 資料存進 localStorage，但要排除密碼
+            $('form :input').on('input', function(){
+                if(this.name !== 'admin_password'){
+                    if(this.name === 'admin_disabled'){
+                        formData[this.name] = $('input[name="admin_disabled"]:checked').val();
+                    }else{
+                        formData[this.name] = $(this).val();
+                    }
+                    localStorage.setItem('formData', JSON.stringify(formData));
+                } 
+            });
+
+            //按提交表單或取消返回上頁時，清空 localStorage
+            $('form').submit(function(){
+                localStorage.removeItem('formData');
+            })
+            $('#clearButton').click(function(){
+                localStorage.removeItem('formData');
+            })
+        })
+    </script>
+</body>
+</html>

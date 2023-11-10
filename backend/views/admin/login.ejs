@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    <h1>系統管理員登入</h1>
+
+    <form method="POST" action="/login">
+        <div>
+            <input type="text" name="admin_name" class="Form__Input" required="required" placeholder="管理員帳號" autofocus="">
+        </div>
+        <div>
+            <input type="password" name="admin_password" class="Form__Input" required="required" placeholder="管理員密碼" autofocus=""> 
+        </div>        
+        <p><%= errorMessage %></p>
+        <button type="submit" class="">登入</button>
+    </form>
+</body>
+</html>
+
+
+

@@ -1,0 +1,60 @@
+<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">✿ 實用中日同形詞攻略法－管理系統</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav"> 
+            <li class="nav-item">
+                <a class="nav-link" href="/list">管理員</a>
+            </li>
+          
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  會員
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">會員管理</a></li>
+                  <li><a class="dropdown-item" href="#">收藏商品</a></li>                 
+                </ul>
+            </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              商品
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">商品管理</a></li>
+              <li><a class="dropdown-item" href="#">商品評價</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              訂單
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">訂單管理</a></li>
+              <li><a class="dropdown-item" href="#">購物車管理</a></li>                 
+            </ul>
+        </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#">活動</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">輪播牆</a>
+          </li>          
+        </ul>
+      </div>
+
+      <% if(admin_name) { %>
+        <a href="/logout" class="btn btn-secondary">登出</a>                
+    
+    <% } else { %>
+        <a href="/login" class="btn btn-secondary">登入</a>        
+    <% } %>
+
+    </div>
+  </nav>
