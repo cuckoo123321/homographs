@@ -1,6 +1,7 @@
 const adminModel = require('../models/adminModel');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const itemsPerPage = 15;
 
 const adminController = {
     login: (req, res) =>{
@@ -84,17 +85,43 @@ const adminController = {
         res.redirect('/');
     },
     
-    getAll: (req, res)=>{
-        adminModel.getAll((err, results)=>{
-            if(err){
+    // getAll: (req, res)=>{
+    //     adminModel.getAll((err, results)=>{
+    //         if(err){
+    //             console.log(err);
+    //         }
+    //         res.render('admin/list',{
+    //             admin: results,
+    //             admin_full_name: req.session.admin_full_name,
+    //         });
+    //     })
+    // },
+
+    getAll: (req, res) => {
+        const page = parseInt(req.query.page) || 1;
+        const offset = (page - 1) * itemsPerPage;
+        const limit = itemsPerPage;
+    
+        adminModel.getAll(offset, limit, (err, results) => {
+            if (err) {
                 console.log(err);
+                return res.status(500).send('Internal Server Error');
             }
-            res.render('admin/list',{
-                admin: results,
-                admin_full_name: req.session.admin_full_name,
+            adminModel.getCount((err, count) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).send('Internal Server Error');
+                }
+                const totalPages = Math.ceil(count / itemsPerPage);
+                res.render('admin/list', {
+                    admin: results,
+                    currentPage: page,
+                    totalPages: totalPages,
+                });
             });
-        })
+        });
     },
+    
 
     delete: (req, res)=>{
         const adminID = req.params.id;
@@ -128,11 +155,11 @@ const adminController = {
                 admin_updated_at,
                 req.params.id,
                 (err) => {
-            if (err) {
-                console.error('Error:', err);
-            } else {
-                res.redirect('/list');
-            }
+                    if (err) {
+                        console.error('Error:', err);
+                    } else {
+                        res.redirect('/list');
+                    }
           });
 
        })
@@ -151,35 +178,7 @@ const adminController = {
             })
         })
     },
-    
-
-    filter: (req, res)=>{
-        const admin_permission_level = req.query.permission;
-        if(!admin_permission_level){
-            adminModel.getAll((err, results)=>{
-                if(err){
-                    console.log(err);
-                }
-                res.render('admin/list',{
-                    admin: results,
-                    admin_full_name: req.session.admin_full_name,
-                });
-            })
-        }else{
-            adminModel.filter(admin_permission_level,(err, results)=>{
-            if(err){
-                console.log(err);
-            }
-            res.render('admin/list',{
-                admin: results,
-                admin_full_name: req.session.admin_full_name,
-            });
-          })
-        }
-        
-    },
-
-    
+      
     
 
 

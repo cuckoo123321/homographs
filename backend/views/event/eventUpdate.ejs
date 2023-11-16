@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+    <%- include('../../css/addUpdateStyle') %>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h2>編輯會員</h2>
+                <% if(errorMessage && errorMessage.length > 0){ %>
+                    <div class="alert alert-dismissible alert-danger">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <strong><%= errorMessage %></strong>
+                    </div>
+                <% } %>
+
+                <form method="POST" action="/update_event/<%= event.event_id %>" data-bitwarden-watching="1">
+
+                    <div class="form-group list">
+                        <label class="form-label">名稱：</label>
+                        <input name="event_title" type="text" class="form-control" value="<%= event.event_title %>" placeholder="請輸入活動名稱" required="required">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">日期：</label>
+                        <% if (event.event_date) { %>
+                            <% const formattedDate = event.event_date.toISOString().split('T')[0]; %>
+                            <input name="event_date" type="date" class="form-control" value="<%= formattedDate %>" >
+                        <% } else { %>
+                            <input name="event_date" type="date" class="form-control">
+                        <% } %>
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">地點：</label>
+                        <input name="event_location" type="text" class="form-control" value="<%= event.event_location %>" placeholder="請輸入活動地點" required="required">
+                    </div>
+    
+                    <div class="form-group list">
+                        <label class="form-label">主辦：</label>
+                        <input name="event_organizer" type="text" class="form-control" value="<%= event.event_organizer %>" placeholder="請輸入主辦單位" required="required">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">簡介：</label>
+                        <textarea name="event_description" class="form-control textarea" rows="10" placeholder="請輸入活動簡介"><%= event.event_description %></textarea>
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">網址：</label>
+                        <input name="event_website" type="text" class="form-control" value="<%= event.event_website %>" placeholder="請輸入活動網址">
+                    </div>
+                    
+                    <div class="form-group list">
+                        <label class="form-label">狀態：</label>
+                        <select class="form-select" name="event_publish">
+                            <option value="" disabled>請選擇狀態</option>
+                            <option value="publish" <% if (event.event_publish === 'publish') { %>selected<% } %>>上架</option>
+                            <option value="unpublish" <% if (event.event_publish === 'unpublish') { %>selected<% } %>>下架</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group list mt-4">
+                        <input type="submit" class="btn btn-success" />
+                        <a class="btn btn-secondary" href="/eventList">返回</a>
+                    </div>
+                </form>
+            </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+
+    <script>
+        let errorMessages = [];
+        //把資料存進 localStorage
+        $(document).ready(function(){
+            const formData = JSON.parse(localStorage.getItem('formData')) || {};
+            //把儲存的資料填進表單，但要排除密碼
+            for(const key in formData){
+                if(formData.hasOwnProperty(key) && key !== 'user_password'){
+                    if(key === 'user_disabled'){
+                        $(`[name="${key}"][value="${formData[key]}"]`).prop('checked', true);
+                    }else{
+                        $(`[name="${key}"]`).val(formData[key]);
+                    }                    
+                }
+            }
+            //把 input 資料存進 localStorage，但要排除密碼
+            $('form :input').on('input', function(){
+                if(this.name !== 'user_password'){
+                    formData[this.name] = $(this).val();
+                    localStorage.setItem('formData', JSON.stringify(formData));
+                } 
+            });
+
+            //按提交表單或取消返回上頁時，清空 localStorage
+            $('form').submit(function(){
+                event.preventDefault(); // 阻止預設提交行為
+                //檢查是否有錯誤訊息
+                if (errorMessages.length === 0 || !hasErrors(errorMessages)) {
+                    // 如果沒有錯誤訊息、實際錯誤，清空 localStorage
+                    localStorage.removeItem('formData');
+                    // 手動提交表單
+                    this.submit();
+                }               
+            })
+            $('#clearButton').click(function(){
+                localStorage.removeItem('formData');
+            })
+        })
+
+        // 檢查否存在實際錯誤
+        function hasErrors(errorMessages) {
+            return errorMessages.filter(function() {
+                return $(this).text().trim().length > 0;
+            }).length > 0;
+        }
+    </script>
+</body>
+</html>

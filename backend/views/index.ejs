@@ -2,10 +2,73 @@
 <html lang="en">
 <head>
     <%- include('template/head') %>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        p {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: rgb(56 137 183);
+            margin: 0 0 100px 0;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        p, .btn-container{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            top: 25vh;
+        }
+
+        .btn {
+            flex: 1;
+            max-width: 100px;
+        }
+
+        @media (max-width: 768px) {
+            p, .btn-container {
+                top: 10vh;
+            }
+            .btn {
+                flex: 0 0 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <%- include('template/navbar') %>   
-    
+    <%- include('template/navbar') %> 
+    <div class="container">
+        <% if(admin_name) { %>            
+            <div><p>歡迎 <%= admin_full_name %> 使用本管理系統</p> </div>
+            <div class="btn-container">
+                <a class="btn btn-primary" href="/list">管理員</a>
+                <a class="btn btn-primary" href="/userList">會員</a>
+                <a class="btn btn-primary" href="#">商品</a>
+                <a class="btn btn-primary" href="#">訂單</a>
+                <a class="btn btn-primary" href="#">活動</a>
+                <a class="btn btn-primary" href="#">輪播牆</a>
+            </div>
+        <% } else { %>
+            <p>歡迎使用中日同形詞管理系統</p>
+            <p>請系統管理員登入系統</p>    
+        <% } %>  
+    </div>
 </body>
 </html>
 

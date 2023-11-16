@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+    <%- include('../../css/addUpdateStyle') %>
+    <style>
+        p{
+            margin-bottom: 0px;
+        }
+        .upload_btton{
+            margin: 30px 0px 0px 50px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h2>編輯輪播牆圖片</h2>
+                <% if(errorMessage && errorMessage.length > 0){ %>
+                <div class="alert alert-dismissible alert-danger">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <strong><%= errorMessage %></strong>
+                </div>
+                <% } %>
+    
+                <form method="POST" action="/update_carousel/<%= carousel.carousel_id %>" enctype="multipart/form-data" data-bitwarden-watching="1">  
+
+                    <div class="form-group list">
+                        <label class="form-label">名稱：</label>
+                        <input name="carousel_title" type="text" class="form-control"  value="<%= carousel.carousel_title %>" placeholder="請輸入圖片名稱" required="required">
+                    </div>
+                    <div class="form-group list">
+                        <label class="form-label">檔名：</label>
+                        <p class="form-control"><%- carousel.carousel_path %></p>
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">原圖：</label>
+                        <div class="form-control">
+                            <img class="img-fluid" src="../../uploads/<%= carousel.carousel_path %>" alt="Carousel Image">
+                        </div>
+                    </div>
+
+                    <div class="form-group list">
+                        <div>                       
+                            <button class="btn btn-primary upload_btton"  type="button" id="uploadButton" onclick="addFileInput()">上傳新圖片</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group list" id="uploadContainer" >
+                        <label class="form-label" id="uploadLabel"style="display: none;">新圖：</label>
+                        <input type="text" name="carousel_path" value="<%- carousel.carousel_path %>" hidden>
+                    </div>
+                    
+                    
+                    <div class="form-group list">
+                        <label class="form-label">狀態：</label>
+                        <select class="form-select" name="carousel_publish">
+                            <option value="" disabled>請選擇狀態</option>
+                            <option value="publish" <% if (carousel.carousel_publish === 'publish') { %>selected<% } %>>上架</option>
+                            <option value="unpublish" <% if (carousel.carousel_publish === 'unpublish') { %>selected<% } %>>下架</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group list mt-4">
+                        <input type="submit" class="btn btn-success" />                        
+                        <a class="btn btn-secondary" href="/carouselList">返回</a>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+    
+
+    <script>
+        //清空欄位
+        $(document).ready(function(){
+            $('#clearButton').click(function(){
+                $('form').find(':input').not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
+            })
+        })
+        
+        //上傳新圖
+        function addFileInput() {
+            let uploadContainer = document.getElementById('uploadContainer');
+            let uploadLabel = document.getElementById('uploadLabel');
+
+            // 檢查是否已經有 <input type="file"> 元素
+            let existingInput = uploadContainer.querySelector('input[type="file"]');
+            if (!existingInput) {
+                // 動態生成 <input type="file"> 元素
+                let fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.name = 'newImage';
+                fileInput.className = 'form-control-file form-control';
+                fileInput.addEventListener('change', displayNewImage);
+
+                // 將新生成的元素添加到容器中
+                uploadContainer.appendChild(fileInput);
+
+                // 顯示 label
+                uploadLabel.style.display = 'block';
+
+                // 更改按鈕文字
+                let button = document.getElementById('uploadButton');
+                if (button) {
+                    button.innerText = '取消上傳新圖片';
+                }
+            } else {
+                // 如果已經有 <input type="file"> 元素，則刪除它
+                existingInput.remove();
+
+                // 隱藏 label
+                uploadLabel.style.display = 'none';
+
+                // 更改按鈕文字
+                let button = document.getElementById('uploadButton');
+                if (button) {
+                    button.innerText = '上傳新圖片';
+                }
+            }
+        }
+
+    function displayNewImage() {
+        let input = document.querySelector('input[type="file"]');
+        let currentImage = document.getElementById('currentImage');
+
+        let file = input.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                currentImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    </script>
+</body>
+</html>

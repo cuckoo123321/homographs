@@ -38,14 +38,30 @@ const adminModel = {
     )
   },
 
-  getAll: (cb) =>{
-    db.query(
-      `SELECT * FROM admins`,
-      (err, results) => {
-        if(err) return cb (err);
-        cb(null, results);
-      }
-    );
+  // getAll: (cb) =>{
+  //   db.query(
+  //     `SELECT * FROM admins`,
+  //     (err, results) => {
+  //       if(err) return cb (err);
+  //       cb(null, results);
+  //     }
+  //   );
+  // },
+
+  getAll:(offset, limit, cb)=>{
+    db.query(`SELECT * FROM admins ORDER BY admin_created_at DESC LIMIT ?, ?`, 
+    [offset, limit],
+    (err,results)=>{
+      if(err) return cb(err);
+      cb(null, results);
+    });
+  },
+  getCount:(cb)=>{
+    db.query(`SELECT COUNT(*) AS count FROM admins`, (err, results)=>{
+      if (err) return cb(err);
+      const count = results[0].count;
+      cb(null,count);
+    })
   },
 
   delete: (admin_id, cb) => {
@@ -73,34 +89,8 @@ const adminModel = {
         });
   },
  
-
-// search: (keyword, cb) => {
-//     let query = `
-//         SELECT *, 
-//         CASE 
-//             WHEN admin_disabled = 0 THEN '啟用' 
-//             WHEN admin_disabled = 1 THEN '停權'
-//         END AS admin_disabled_text
-//         FROM admins
-//         WHERE (admin_name LIKE ? OR admin_full_name LIKE ? OR admin_email LIKE ? OR admin_permission_level LIKE ? OR admin_created_at LIKE ? OR admin_updated_at LIKE ?)
-//     `;
-
-//     if (keyword === '啟用') {
-//         query += ' AND admin_disabled = 0';
-//     } else if (keyword === '停權') {
-//         query += ' AND admin_disabled = 1';
-//     }
-
-//     db.query(query,
-//         [`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`],
-//         (err, results) => {
-//             if (err) return cb(err);
-//             cb(null, results);
-//         }
-//     );
-// },
   search:(keyword, cb) => {
-    // 使用 SQL 查询进行模糊搜索
+    // 使用 SQL 查詢進行模糊搜尋
     db.query(
       'SELECT * FROM admins WHERE admin_name LIKE ? OR admin_full_name LIKE ? OR admin_email LIKE ? OR admin_permission_level LIKE ? OR admin_created_at LIKE ? OR admin_updated_at LIKE ?',
       [`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`],
@@ -110,17 +100,8 @@ const adminModel = {
       }
     );
   },
+  
 
-
-  filter: (admin_permission_level, cb) =>{
-    db.query(
-      `SELECT * FROM admins WHERE admin_permission_level = ?`,[admin_permission_level],
-      (err, results) => {
-        if(err) return cb (err);
-        cb(null, results);
-      }
-    );
-  },
 }
 
 module.exports = adminModel;

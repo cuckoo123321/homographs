@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+    <%- include('../../css/addUpdateStyle') %>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h2>新增會員</h2>
+                <% if(errorMessage && errorMessage.length > 0){ %>
+                <div class="alert alert-dismissible alert-danger">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <strong><%= errorMessage %></strong>
+                </div>
+                <% } %>
+    
+                <form method="POST" action="/userAdd" data-bitwarden-watching="1">    
+                    <div class="form-group list">
+                        <label class="form-label">帳號：</label>
+                        <input name="user_name" type="text" class="form-control" placeholder="請輸入會員帳號" required="required">
+                    </div>
+    
+                    <div class="form-group list">
+                        <label class="form-label">密碼：</label>
+                        <input name="user_password" type="password" class="form-control" placeholder="請輸入會員密碼" required="required">
+                    </div>
+    
+                    <div class="form-group list">
+                        <label class="form-label">信箱：</label>
+                        <input name="user_email" type="email" class="form-control" placeholder="請輸入會員信箱" required="required">
+                    </div>
+    
+                    <div class="form-group list">
+                        <label class="form-label">性別:</label>
+                        <select class="form-select" name="user_gender">
+                            <option value="" disabled selected>請選擇性別</option>
+                            <option value="male">男性</option>
+                            <option value="female">女性</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+    
+                    <div class="form-group list">
+                        <label class="form-label">生日：</label>
+                        <input name="user_birthdate" type="date" class="form-control" placeholder="請選擇生日">
+                    </div>
+    
+                    <div class="form-group list mt-4">
+                        <input type="submit" class="btn btn-success" />
+                        <button type="button" class="btn btn-warning" id="clearButton">清空</button>
+                        <a class="btn btn-secondary" href="/userList">返回</a>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+    
+
+    <script>
+        //清空欄位
+        $(document).ready(function(){
+            $('#clearButton').click(function(){
+                $('form').find(':input').not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
+            })
+        })
+
+        // //把資料存進 localStorage
+        // $(document).ready(function(){
+        //     const formData = JSON.parse(localStorage.getItem('formData')) || {};
+        //     //把儲存的資料填進表單，但要排除密碼
+        //     for(const key in formData){
+        //         if(formData.hasOwnProperty(key) && key !== 'user_password'){
+        //             if(key === 'user_gender'){
+        //                 $(`[name="${key}"][value="${formData[key]}"]`).prop('checked', true);
+        //             }else{
+        //                 $(`[name="${key}"]`).val(formData[key]);
+        //             }                    
+        //         }
+        //     }
+        //     //把 input 資料存進 localStorage，但要排除密碼
+        //     $('form :input').on('input', function(){
+        //         if(this.name !== 'user_password'){
+        //             // if(this.name === 'user_gender'){
+        //             //     formData[this.name] = $('input[name="admin_disabled"]:checked').val();
+        //             // }else{
+        //             //     formData[this.name] = $(this).val();
+        //             // }
+        //             localStorage.setItem('formData', JSON.stringify(formData));
+        //         } 
+        //     });
+
+        //     //按提交表單或取消返回上頁時，清空 localStorage
+        //     $('form').submit(function(){
+        //         //檢查是否有錯誤訊息
+        //         if (errorMessages.length === 0 || !hasErrors(errorMessages)) {
+        //         // 如果沒有錯誤訊息、實際錯誤，清空 localStorage
+        //         localStorage.removeItem('formData');
+        //         }               
+        //     })
+        //     $('#clearButton').click(function(){
+        //         localStorage.removeItem('formData');
+        //     })
+        // })
+
+        // // 檢查否存在實際錯誤
+        // function hasErrors(errorMessages) {
+        //     return errorMessages.filter(function() {
+        //         return $(this).text().trim().length > 0;
+        //     }).length > 0;
+        // }
+    </script>
+</body>
+</html>

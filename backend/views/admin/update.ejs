@@ -2,38 +2,123 @@
 <html lang="en">
 <head>
     <%- include('../template/head') %>
+    <%- include('../../css/addUpdateStyle') %>
 </head>
 <body>
     <%- include('../template/navbar') %>
-    <h1>編輯系統管理員</h1>
-    <h2><%= errorMessage %></h2>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h2>編輯系統管理員</h2>
+                <% if(errorMessage && errorMessage.length > 0){ %>
+                    <div class="alert alert-dismissible alert-danger">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <strong><%= errorMessage %></strong>
+                    </div>
+                <% } %>
 
-    <form method="POST" action="/update_admin/<%= admin.admin_id %>">
-        <div>姓名:<input type="text" name="admin_full_name" value="<%= admin.admin_full_name %>" placeholder="請輸入管理員名稱" /></div>
-    <div>帳號:<input type="text" name="admin_name" value="<%= admin.admin_name %>" placeholder="請輸入帳號" /></div>
-    <div>密碼:<input type="password" name="admin_password" value="<%= admin.admin_password %>" placeholder="請輸入密碼" /></div>
-    <div>信箱:<input type="text" name="admin_email" value="<%= admin.admin_email %>" placeholder="請輸入信箱" /></div>
-    <div>權限:
-        <select name="admin_permission_level">
-            <option value="" disabled>請選擇權限</option>
-            <option value="Super" <% if (admin.admin_permission_level === 'Super') { %>selected<% } %>>Super</option>
-            <option value="Basic" <% if (admin.admin_permission_level === 'Basic') { %>selected<% } %>>Basic</option>
-        </select>
+                <form method="POST" action="/update_admin/<%= admin.admin_id %>" data-bitwarden-watching="1">
+                    <div class="form-group list">
+                        <label for="admin_full_name" class="form-label">姓名：</label>
+                        <input name="admin_full_name" type="text" class="form-control" value="<%= admin.admin_full_name %>" placeholder="請輸入管理員名稱">
+                    </div>
+
+                    <div class="form-group list">
+                        <label for="admin_name" class="form-label">帳號：</label>
+                        <input name="admin_name" type="text" class="form-control" value="<%= admin.admin_name %>"  placeholder="請輸入帳號">
+                    </div>
+
+                    <div class="form-group list">
+                        <label for="admin_password" class="form-label">密碼：</label>
+                        <input name="admin_password" type="password" class="form-control" value="<%= admin.admin_password %>"  placeholder="請輸入密碼">
+                    </div>
+
+                    <div class="form-group list">
+                        <label for="admin_email" class="form-label">信箱：</label>
+                        <input name="admin_email" type="email" class="form-control" value="<%= admin.admin_email %>"  placeholder="請輸入管理員信箱">
+                    </div>
+                    
+                    <div class="form-group list">
+                        <label for="admin_permission_level" class="form-label">權限:</label>
+                        <select class="form-select" name="admin_permission_level">
+                            <option value="" disabled>請選擇權限</option>
+                            <option value="Super" <% if (admin.admin_permission_level === 'Super') { %>selected<% } %>>Super</option>
+                            <option value="Basic" <% if (admin.admin_permission_level === 'Basic') { %>selected<% } %>>Basic</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group list_radio">
+                        <label class="form-label">狀態：</label>
+                        <div class="form-check div_radio">
+                            <input class="form-check-input input_radio" type="radio" name="admin_disabled" value="0" id="enabled" <% if (admin.admin_disabled === 0) { %>checked<% } %>>
+                            <label class="form-check-label" for="enabled">
+                                啟用
+                            </label>
+                        </div>
+                        <div class="form-check div_radio">
+                            <input class="form-check-input input_radio" type="radio" name="admin_disabled" value="1" id="disabled" <% if (admin.admin_disabled === 1) { %>checked<% } %>>
+                            <label class="form-check-label" for="disabled">
+                                停權
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group list mt-4">
+                        <input type="submit" class="btn btn-success" />
+                        <a class="btn btn-secondary" href="/list">返回</a>
+                    </div>
+                </form>
+            </div>
+        <div class="col-md-3"></div>
     </div>
-    <div>狀態:
-        <input type="radio" name="admin_disabled" value="0" id="enabled" <% if (admin.admin_disabled === 0) { %>checked<% } %>>
-        <label for="enabled">啟用</label>
-
-        <input type="radio" name="admin_disabled" value="1" id="disabled" <% if (admin.admin_disabled === 1) { %>checked<% } %>>
-        <label for="disabled">停權</label>
-    </div>
-
-    <input type="submit" class="btn btn-outline-success" />
-    <a class="btn btn-outline-secondary" href="/list">取消</a>
-    </form>
+</div>
 
     <script>
-        
+        //把資料存進 localStorage
+        $(document).ready(function(){
+            const formData = JSON.parse(localStorage.getItem('formData')) || {};
+            //把儲存的資料填進表單，但要排除密碼
+            for(const key in formData){
+                if(formData.hasOwnProperty(key) && key !== 'admin_password'){
+                    if(key === 'admin_disabled'){
+                        $(`[name="${key}"][value="${formData[key]}"]`).prop('checked', true);
+                    }else{
+                        $(`[name="${key}"]`).val(formData[key]);
+                    }                    
+                }
+            }
+            //把 input 資料存進 localStorage，但要排除密碼
+            $('form :input').on('input', function(){
+                if(this.name !== 'admin_password'){
+                    if(this.name === 'admin_disabled'){
+                        formData[this.name] = $('input[name="admin_disabled"]:checked').val();
+                    }else{
+                        formData[this.name] = $(this).val();
+                    }
+                    localStorage.setItem('formData', JSON.stringify(formData));
+                } 
+            });
+
+            //按提交表單或取消返回上頁時，清空 localStorage
+            $('form').submit(function(){
+                //檢查是否有錯誤訊息
+                if (errorMessages.length === 0 || !hasErrors(errorMessages)) {
+                // 如果沒有錯誤訊息、實際錯誤，清空 localStorage
+                localStorage.removeItem('formData');
+                }               
+            })
+            $('#clearButton').click(function(){
+                localStorage.removeItem('formData');
+            })
+        })
+
+        // 檢查否存在實際錯誤
+        function hasErrors(errorMessages) {
+            return errorMessages.filter(function() {
+                return $(this).text().trim().length > 0;
+            }).length > 0;
+        }
     </script>
 </body>
 </html>
