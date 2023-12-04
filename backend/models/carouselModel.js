@@ -84,9 +84,19 @@ const carouselModel = {
     );
   },
 
-
-  
-
+  // Function to get carousel data from the database (API)
+  getCarouselData: () => {
+    return new Promise((resolve, reject) => {
+      db.query(`SELECT * FROM carousels WHERE carousel_publish = 'publish' `, (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  },
 }
+
 
 module.exports = carouselModel;

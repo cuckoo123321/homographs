@@ -1,0 +1,408 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* .topInfo */
+
+.topInfo{
+    background: #04a8e0;
+    width: 100%;
+    height: 50px;
+    padding: 12px 15px;
+    display: block;
+    text-align: center;
+    font-family: "A+mfCv-AXIS Font \30d9\30fc\30b7\30c3\30af R ProN",sans-serif;
+    line-height: 2;
+    color: #ffffff;
+    font-weight: 400;
+    font-size: x-small;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeSpeed;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    transition: opacity 1.5s ease-in-out;
+}
+.pushed-up {
+    transform: translateY(-100%);
+}
+
+/* blueBottleMember */
+
+.blueBottleMember{
+    width: 200px;
+    height: 42.5px;
+    padding: 14px 28px;
+    text-align: center;
+    color: #ffffff;
+    font-weight: 200;
+    font-size: small;
+    letter-spacing: .08em;
+    background: #04a8e0;
+    border: none;
+    position: fixed;
+    bottom: 20px;
+    z-index: 2;
+}
+
+/* navi */
+
+.navi{
+    background: #ffffff;
+    width: 100%;
+    height: 75px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 50px;
+    position: fixed;
+    top:50px;
+    z-index: 1000;
+}
+
+
+.navi__left, .navi__right{
+    display: flex;
+    align-items: center;
+    font-family: "A+mfCv-AXIS Font \30d9\30fc\30b7\30c3\30af R ProN",sans-serif;
+}
+
+.navi__left{
+    text-rendering: optimizeSpeed;        
+}
+
+.navi__left > div{
+    margin: 6px 10px;
+    font-weight: 325;
+    letter-spacing: .06em;
+    font-size:normal;
+    font-family: "A+mfCv-AXIS Font \30d9\30fc\30b7\30c3\30af R ProN",sans-serif;
+}
+
+.navi__right > *{
+    margin: 0 10px;
+    text-rendering: optimizeSpeed;
+    font-weight:250;
+    font-size:x-small;
+    letter-spacing: .04em;
+}
+.navi__right > div{
+    height: 55px;
+    display: flex;
+    flex-direction: column;/*設置主軸為垂直方向*/
+    align-items: center; /* 在主軸（垂直方向）上置中 */
+    justify-content: center; /* 在交叉軸（水平方向）上置中 */
+    text-align: center; /* 讓文字置中 */
+}
+
+.logo{
+    width: 60px;
+    height: 33px;
+}
+
+.navi__icon{
+    font-size:21px;
+    color: #333333;
+    font-weight: 900;
+}
+
+/* .carousel */
+
+.carousel {
+    position: relative;
+    top:125px;
+}
+.carousel__item{
+    width: 100%;
+    height: 575px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: linear-gradient(to bottom, rgba(156, 155, 155, 0.2), rgba(0, 0, 0, 0.7)); /* 設定透明背景色 */    
+    z-index: 1;
+}
+
+.carousel__img{
+    width: 100%;
+    height: 575px;
+    overflow: hidden; /* 裁剪多餘的部分 */     
+    object-fit: cover;/* 圖片填滿容器，保持寬高比，可能超出容器 */   
+    object-position: center center;/* 調整圖片在容器內的顯示位置 */
+}
+
+.carousel__page > div{
+    width: 10px;
+    height: 10px;    
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    /* background: #04a8e0;     */
+    z-index: 2; 
+}
+.carousel__page > div:hover{
+    background: #ffffff;
+    cursor: pointer;
+}
+#carousel__page1{   
+    position: absolute;
+    bottom: 50px;
+    right: 130px;   
+}
+#carousel__page2{   
+    position: absolute;
+    bottom: 50px;
+    right: 105px;  
+}
+#carousel__page3{   
+    position: absolute;
+    bottom: 50px;
+    right: 80px;   
+}
+#carousel__page4{   
+    position: absolute;
+    bottom: 50px;
+    right: 55px;  
+}
+#carousel__page5{   
+    position: absolute;
+    bottom: 50px;
+    right: 30px;   
+}
+/* .newItem */
+
+.newItem{
+    width: 100%;
+    height: 730.2px;
+    position: absolute;
+    top:725px;
+    padding: 80px 0;
+
+}
+
+.newItem__title > h3, .ranking__title > h3{
+    text-align: center;
+    font-weight: 300;
+    color: #444444;
+    letter-spacing: .04em;
+}
+.newItem__card{
+    display: flex;   
+    align-items: center; /* 在主軸（垂直方向）上置中 */
+    justify-content: center; /* 在交叉軸（水平方向）上置中 */
+    text-align: center; /* 讓文字置中 */
+    margin: 80px 10px;
+}
+.newItem__label-1{
+    width: 100px;
+    height: auto;
+    background: #04a8e0;   
+    display: inline;
+    text-align: center;
+    font-family: "A+mfCv-AXIS Font \30d9\30fc\30b7\30c3\30af R ProN",sans-serif;
+    line-height: 2;
+    color: #ffffff;
+    font-weight: 200;
+    font-size: x-small;
+    position: absolute;
+    top: 205px;
+    left: 240px;
+    z-index: 1;
+}
+.newItem__label-2{
+    width: 80px;
+    height: auto;
+    background: #ffffff;   
+    display: inline;
+    text-align: center;
+    font-family: "A+mfCv-AXIS Font \30d9\30fc\30b7\30c3\30af R ProN",sans-serif;
+    line-height: 2;
+    color: black;
+    font-weight: 200;
+    font-size: x-small;
+    position: absolute;
+    top: 205px;
+    left: 425px;
+    z-index: 1;
+}
+.newItem___img {
+    width: 275px;
+    height: 275px;
+    overflow: hidden;
+    object-fit: cover;
+    object-position: center center;
+    position: relative;
+}
+
+.newItem__img-group1{
+    background-image: url("./imgs/newItem/item1.webp");
+    background-size: cover;
+    transition: transform 0.8s ease-in-out;
+}
+.newItem__img-group1:hover{
+    background-image: url("./imgs/newItem/item1-2.webp");
+    cursor: pointer;
+}
+.newItem__img-group2{
+    background-image: url("./imgs/newItem/item2.webp");
+    background-size: cover;
+    transition: transform 0.8s ease-in-out;
+}
+.newItem__img-group2:hover{
+    background-image: url("./imgs/newItem/item2-2.webp");
+    cursor: pointer;
+}
+.newItem__img-group3{
+    background-image: url("./imgs/newItem/item3.webp");
+    background-size: cover;
+    transition: transform 0.8s ease-in-out;
+}
+.newItem__img-group3:hover{
+    background-image: url("./imgs/newItem/item2-2.webp");
+    cursor: pointer;
+}
+.newItem__img-group4{
+    background-image: url("./imgs/newItem/item4.webp");
+    background-size: cover;
+    transition: transform 0.8s ease-in-out;
+}
+.newItem__img-group4:hover{
+    background-image: url("./imgs/newItem/item4-2.webp");
+    cursor: pointer;
+}
+
+.newItem__card > div{
+    margin: 0 30px;
+}
+
+.newItme__text{
+    width: 275px;
+    height: 36px;
+    margin-top: 15px;
+    font-weight: 300;
+    font-size: x-small;
+    font-family: "A+mfCv-AXIS Font \30d9\30fc\30b7\30c3\30af R ProN",sans-serif;
+    letter-spacing: .04em;
+}
+
+.price{
+    font-weight: 300;
+    font-size: x-small;
+    letter-spacing: .08em;
+    color: rgb(126 126 126);
+}
+
+.price::before{
+    content: "¥";
+    font-weight: 300;
+    font-size: x-small;
+    letter-spacing: .08em;
+    color: rgb(126 126 126);
+}
+.price::after{
+    content: attr(data-price);
+    font-weight: 300;
+    font-size: x-small;
+    letter-spacing: .08em;
+    color: rgb(126 126 126);
+}
+
+.newItem__button-container{
+    display: flex;
+    justify-content: center; /* 水平置中 */
+    align-items: center; /* 垂直置中 */
+}
+
+.newItem__button{
+    width: 128.41px;
+    height: 42.5px;
+    padding: 14px 28px;
+    text-align: center;
+    color: #ffffff;
+    font-weight: 200;
+    font-size: small;
+    letter-spacing: .08em;
+    background: #04a8e0;
+    border: none;    
+}
+
+/* .pickUp */
+
+.pickUp{
+    width: 100%;
+    height: 730.2px;
+    position: absolute;
+    top:1400px;
+    padding: 80px 0;
+}
+.pickUp__title > h3{
+    text-align: center;
+    font-weight: 300;
+    color: #444444;
+    letter-spacing: .04em;
+}
+.pickUp__card{
+    display: flex;   
+    align-items: center; /* 在主軸（垂直方向）上置中 */
+    justify-content: center; /* 在交叉軸（水平方向）上置中 */
+    text-align: center; /* 讓文字置中 */
+    margin: 80px 10px;
+}
+.pickUp__item {
+    position: relative;
+    margin: 0 30px;
+}
+.pickUp___img {
+    width: 386.66px;
+    height: 386.66px;
+    overflow: hidden;
+    object-fit: cover;
+    object-position: center center;
+    position: relative;
+    margin: 0 5px;
+    /* padding-bottom: 17px; */
+}
+.pickUp__overlay { 
+    width: 386.66px;
+    height: 386.66px;
+    margin: 0 5px;
+    padding-bottom: 17px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    background: linear-gradient(to bottom, rgba(156, 155, 155, 0.2), rgba(0, 0, 0, 0.8)); /* 設定透明背景色 */    
+    transition: opacity 1s ease-in-out; /* 設定過渡效果 */
+    z-index: 1;
+}
+.pickUp__item:hover .pickUp__overlay {
+    background: linear-gradient(to bottom, rgba(192, 191, 191, 0.2), rgba(0, 0, 0, 0.5));
+}
+.pickUp__text{    
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    box-pack: center;
+    justify-content: center;
+    box-align: center;
+    align-items: center;
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    color: #ffffff;
+    width: auto;
+    height: auto;
+}
+
+/* ranking */
+.ranking{
+    width: 100%;
+    height: 730.2px;
+    position: absolute;
+    top:2000px;
+    padding: 80px 0;
+}

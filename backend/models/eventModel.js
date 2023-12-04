@@ -64,7 +64,21 @@ const eventModel = {
                 cb(null);
             }
         )
-    }
+    },
+
+     // Function to get data from the database (API)
+    getEventData: () => {
+        return new Promise((resolve, reject) => {
+        db.query(`SELECT * FROM events WHERE event_publish = 'publish' ORDER BY event_date ASC;
+        `, (error, results) => {
+            if (error) {
+            reject(error);
+            } else {
+            resolve(results);
+            }
+        });
+        });
+    },
 
 }
 

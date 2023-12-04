@@ -9,7 +9,12 @@ const adminController = require('./controllers/adminController');
 const userController = require('./controllers/userController');
 const eventController = require('./controllers/eventController');
 const carouselController = require('./controllers/carouselController');
+const productController = require('./controllers/productController');
+const productReviewController = require('./controllers/productReviewController');
 const path = require('path');
+const apiRoutes = require('./routes/apiRoutes'); //API路由
+const cors = require('cors'); //同源政策
+require('dotenv').config();
 
 
 //設置視圖引擎
@@ -23,6 +28,11 @@ app.use(session({
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+//確保 app.use(cors()) 的設定位於 app.use(apiRoutes) 之前
+app.use(cors());
+app.use(apiRoutes);
+
 
 //配置中間件
 app.use(flash());
@@ -54,7 +64,6 @@ app.get('/logout', adminController.logout);
 app.get('/add', adminController.add);
 app.post('/add', adminController.handleAdd, redirectBack);
 app.get('/list', adminController.getAll);
-app.get('/admin/list', adminController.getAll);
 app.get('/delete_admin/:id', adminController.delete);
 app.get('/update_admin/:id', adminController.update);
 app.post('/update_admin/:id', adminController.handleUpdate);
@@ -64,16 +73,31 @@ app.get('/search', adminController.search);
 app.get('/userAdd', userController.add);
 app.post('/userAdd', userController.handleAdd, redirectBack);
 app.get('/userList', userController.getAll);
-app.get('/user/userList', userController.getAll);
 app.get('/update_user/:id', userController.update);
 app.post('/update_user/:id', userController.handleUpdate);
 app.get('/delete_user/:id', userController.softDelete);
+//user前端用 API
+app.post('/userLogin', userController.userLogin);
+app.get('/user', userController.getUserInfo);
+//註冊user
+app.post('/userRegister', userController.userRegister);
+
+//product
+app.get('/productAdd', productController.add);
+app.post('/productAdd', productController.handleAdd, redirectBack);
+app.get('/productList', productController.getAll);
+app.get('/update_product/:id', productController.update);
+app.post('/update_product/:id', productController.handleUpdate);
+app.get('/delete_product/:id', productController.delete);
+
+//productReview
+app.get('/productReviewList', productReviewController.getAll);
+//app.get('/delete_productReview/:id', productReviewController.delete);
 
 //event
 app.get('/eventAdd', eventController.add);
 app.post('/eventAdd', eventController.handleAdd, redirectBack);
 app.get('/eventList', eventController.getAll);
-app.get('/event/eventList', eventController.getAll);
 app.get('/update_event/:id', eventController.update);
 app.post('/update_event/:id', eventController.handleUpdate);
 app.get('/delete_event/:id', eventController.delete);
@@ -82,7 +106,6 @@ app.get('/delete_event/:id', eventController.delete);
 app.get('/carouselAdd', carouselController.add);
 app.post('/carouselAdd', carouselController.handleAdd, redirectBack);
 app.get('/carouselList', carouselController.getAll);
-app.get('/carousel/carouselList', carouselController.getAll);
 app.get('/update_carousel/:id', carouselController.update);
 app.post('/update_carousel/:id', carouselController.handleUpdate);
 app.get('/delete_carousel/:id', carouselController.delete);

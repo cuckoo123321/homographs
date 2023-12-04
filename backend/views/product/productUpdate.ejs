@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+    <%- include('../../css/addUpdateStyle') %>
+    <style>
+        p{
+            margin-bottom: 0px;
+        }
+        .upload_btton{
+            margin: 30px 0px 0px 50px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h2>編輯商品</h2>
+                <% if(errorMessage && errorMessage.length > 0){ %>
+                <div class="alert alert-dismissible alert-danger">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <strong><%= errorMessage %></strong>
+                </div>
+                <% } %>
+    
+                <form method="POST" action="/update_product/<%= product.product_id %>" enctype="multipart/form-data" data-bitwarden-watching="1">  
+                    
+                    <div class="form-group list">
+                        <label class="form-label">編號：</label>
+                        <input name="product_number" type="text" class="form-control" placeholder="請輸入商品編號" value="<%= product.product_number %>" >
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">名稱：</label>
+                        <input name="product_title" type="text" class="form-control" placeholder="請輸入商品名稱" value="<%= product.product_title %>">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">檔名：</label>
+                        <p class="form-control"><%- product.product_path %></p>
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">原圖：</label>
+                        <div class="form-control">
+                            <img class="img-fluid" src="../../uploads/<%= product.product_path %>" alt="Product Image">
+                        </div>
+                    </div>
+
+                    <div class="form-group list">
+                        <div>                       
+                            <button class="btn btn-primary upload_btton"  type="button" id="uploadButton" onclick="addFileInput()">上傳新圖片</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group list" id="uploadContainer" >
+                        <label class="form-label" id="uploadLabel"style="display: none;">新圖：</label>
+                        <input type="text" name="product_path" value="<%- product.product_path %>" hidden>
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">定價：</label>
+                        <input name="product_price" type="text" class="form-control" placeholder="請輸入商品定價" value="<%= product.product_price %>">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">特價：</label>
+                        <input name="product_discount" type="text" class="form-control" placeholder="請輸入商品特價" value="<%= product.product_discount %>">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">簡介：</label>
+                        <input name="product_description" type="text" class="form-control" placeholder="請輸入商品簡介" value="<%= product.product_description %>">
+                    </div>
+                    
+                    <div class="form-group list">
+                        <label class="form-label">分類：</label>
+                        <input name="product_category" type="text" class="form-control" placeholder="請輸入商品分類" value="<%= product.product_category %>">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">庫存：</label>
+                        <input name="product_stock" type="text" class="form-control" placeholder="請輸入商品庫存" value="<%= product.product_stock %>">
+                    </div>
+                    
+                    <div class="form-group list">
+                        <label class="form-label">狀態：</label>
+                        <select class="form-select" name="product_publish">
+                            <option value="" disabled>請選擇狀態</option>
+                            <option value="publish" <% if (product.product_publish === 'publish') { %>selected<% } %>>上架</option>
+                            <option value="unpublish" <% if (product.product_publish === 'unpublish') { %>selected<% } %>>下架</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group list mt-4">
+                        <input type="submit" class="btn btn-success" />
+                        <button type="button" class="btn btn-warning" id="clearButton">清空</button>
+                        <a class="btn btn-secondary" href="/productList">返回</a>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+    
+
+    <script>
+        //清空欄位
+        $(document).ready(function(){
+            $('#clearButton').click(function(){
+                $('form').find(':input').not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
+            })
+        })
+
+        //上傳新圖
+        function addFileInput() {
+            let uploadContainer = document.getElementById('uploadContainer');
+            let uploadLabel = document.getElementById('uploadLabel');
+
+            // 檢查是否已經有 <input type="file"> 元素
+            let existingInput = uploadContainer.querySelector('input[type="file"]');
+            if (!existingInput) {
+                // 動態生成 <input type="file"> 元素
+                let fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.name = 'newImage';
+                fileInput.className = 'form-control-file form-control';
+                fileInput.addEventListener('change', displayNewImage);
+
+                // 將新生成的元素添加到容器中
+                uploadContainer.appendChild(fileInput);
+
+                // 顯示 label
+                uploadLabel.style.display = 'block';
+
+                // 更改按鈕文字
+                let button = document.getElementById('uploadButton');
+                if (button) {
+                    button.innerText = '取消上傳新圖片';
+                }
+            } else {
+                // 如果已經有 <input type="file"> 元素，則刪除它
+                existingInput.remove();
+
+                // 隱藏 label
+                uploadLabel.style.display = 'none';
+
+                // 更改按鈕文字
+                let button = document.getElementById('uploadButton');
+                if (button) {
+                    button.innerText = '上傳新圖片';
+                }
+            }
+        }
+
+    function displayNewImage() {
+        let input = document.querySelector('input[type="file"]');
+        let currentImage = document.getElementById('currentImage');
+
+        let file = input.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                currentImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+
+        // //把資料存進 localStorage
+        // $(document).ready(function(){
+        //     const formData = JSON.parse(localStorage.getItem('formData')) || {};
+        //     //把儲存的資料填進表單，但要排除密碼
+        //     for(const key in formData){
+        //         if(formData.hasOwnProperty(key) && key !== 'user_password'){
+        //             if(key === 'user_gender'){
+        //                 $(`[name="${key}"][value="${formData[key]}"]`).prop('checked', true);
+        //             }else{
+        //                 $(`[name="${key}"]`).val(formData[key]);
+        //             }                    
+        //         }
+        //     }
+        //     //把 input 資料存進 localStorage，但要排除密碼
+        //     $('form :input').on('input', function(){
+        //         if(this.name !== 'user_password'){
+        //             // if(this.name === 'user_gender'){
+        //             //     formData[this.name] = $('input[name="admin_disabled"]:checked').val();
+        //             // }else{
+        //             //     formData[this.name] = $(this).val();
+        //             // }
+        //             localStorage.setItem('formData', JSON.stringify(formData));
+        //         } 
+        //     });
+
+        //     //按提交表單或取消返回上頁時，清空 localStorage
+        //     $('form').submit(function(){
+        //         //檢查是否有錯誤訊息
+        //         if (errorMessages.length === 0 || !hasErrors(errorMessages)) {
+        //         // 如果沒有錯誤訊息、實際錯誤，清空 localStorage
+        //         localStorage.removeItem('formData');
+        //         }               
+        //     })
+        //     $('#clearButton').click(function(){
+        //         localStorage.removeItem('formData');
+        //     })
+        // })
+
+        // // 檢查否存在實際錯誤
+        // function hasErrors(errorMessages) {
+        //     return errorMessages.filter(function() {
+        //         return $(this).text().trim().length > 0;
+        //     }).length > 0;
+        // }
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+/* .carousel */
+
+// .carousel__item {
+//     width: 100%;
+//     height: 600px;
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     background: linear-gradient(to bottom, rgba(156, 155, 155, 0.2), rgba(0, 0, 0, 0.7));
+//     z-index: 1;
+// }
+
+// .carousel__img {
+//     width: 100%;
+//     height: 600px;
+//     overflow: hidden;
+//     object-fit: cover;
+//     object-position: center center;
+// }
+
+// .carousel__page > div {
+//     width: 15px;
+//     height: 15px;
+//     border-radius: 50%;
+//     border: 3px solid rgb(47 150 169);
+//     position: absolute;
+//     top: 550px;
+//     margin-right: 30px;
+  
+//     &:hover {
+//         background: rgb(47 150 169);
+//         cursor: pointer;
+//     }
+// }
+
+
+// $pages-count: 5;
+// $page-offset: 25px; // 調整每個按鈕之間的間距
+
+// @for $i from 1 through $pages-count {
+//   #carousel__page#{$i} {
+//     position: absolute;
+//     bottom: 50px;
+//     right: 130px - ($page-offset * ($i - 1));
+//   }
+// }

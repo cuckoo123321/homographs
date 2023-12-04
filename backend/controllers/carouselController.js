@@ -202,11 +202,6 @@ const carouselController = {
         });
     },
     
-    
-    
-
-    
-    
 
     delete: (req, res) => {
         const carouselID = req.params.id;
