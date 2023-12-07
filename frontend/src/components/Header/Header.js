@@ -1,17 +1,19 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useState, useEffect } from 'react';
 import { StyleSheetManager } from 'styled-components';
 import isPropValid from '@emotion/is-prop-valid';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRightToBracket, faPenToSquare, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faRightToBracket, faPenToSquare, faRightFromBracket, faUser,faCartShopping, faRectangleList } from '@fortawesome/free-solid-svg-icons';
 import { faOptinMonster} from '@fortawesome/free-brands-svg-icons';
 import { Link, useLocation } from "react-router-dom";
-import { useContext } from 'react';
-import { AuthContext } from '../../contexts';
-import { setAuthToken } from '../../constants/utils';
+import { useContext } from 'react'; ////用於在函式組件中存取上下文
+import { AuthContext } from '../../contexts'; //該上下文是用於存儲和共享身份驗證相關資訊的上下文
+import { setAuthToken } from '../../constants/utils';//設置 token
 import { useNavigate } from 'react-router-dom';
 import { MEDIA_QUERY_MOBILE, MEDIA_QUERY_TABLET } from '../../constants/style';
+import ShoppingCartPopover from '../../pages/ShoppingCartPopover/index';
 
 const baseLinkStyles = css`
   height: 70px;
@@ -120,6 +122,22 @@ const NavRight = styled(Link)`
   }
 `;
 
+const Badge = styled.div`
+  width:20px;
+  height:20px;
+  background-color: rgb(233 85 102);
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0px;
+  right: 180px;
+`;
+
 const LeftContainer = styled.div`
   display: flex;
   align-items: center;
@@ -134,13 +152,40 @@ export default function Header() {
   const location = useLocation();
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [showPopover, setShowPopover] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+
+  useEffect(() => {
+    // 在組件初次渲染時，從 localStorage 中取出資料
+    const storedCartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    setCartItems(storedCartItems);
+  }, []);
+
+  const handleRemoveItem = (productId) => {
+    // 處理移除商品的邏輯，同時更新本地和狀態
+    const updatedCartItems = cartItems.filter((item) => item.product_id !== productId);
+    setCartItems(updatedCartItems);
+    localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+  };
+
+  const handleCartClick = () => {
+    setShowPopover(!showPopover);
+  };
+
 
   const handleLogout = () => {
+    // 清空購物車的本地存儲數據
+    localStorage.removeItem('cartItems');
     setAuthToken('');
     setUser(null);
     if(location.pathname !== '/'){
       navigate('/');
     }    
+  };  
+
+  const handleCheckout = () => {
+    // 導向結帳頁面
+    navigate("/checkOut");
   };
 
    return (
@@ -166,6 +211,34 @@ export default function Header() {
             <div><FontAwesomeIcon icon={faRightToBracket} style={{ color: "#2f96a9", fontSize: "24px"}} /></div>
             <div>登入</div>          
           </NavRight> }
+
+          {user && <NavRight>
+            <div><FontAwesomeIcon icon={faRectangleList} style={{color: "#2f96a9", fontSize: "24px"}} /></div>
+            <div>訂單</div>
+          </NavRight> }        
+
+          {user && (
+            <NavRight onClick={handleCartClick}>
+              <div>
+                {cartItems.length > 0 && (
+                  <Badge>{cartItems.length}</Badge>
+                )}
+
+                <FontAwesomeIcon icon={faCartShopping} style={{ color: "#2f96a9", fontSize: "24px" }} />
+                
+                {showPopover && (
+                  <ShoppingCartPopover
+                    // 將購物車資訊傳遞給 ShoppingCartPopover
+                    cartItems={cartItems}
+                    setCartItems={setCartItems} 
+                    onRemove={handleRemoveItem}
+                    onCheckout={handleCheckout}
+                  />
+                )}
+              </div>
+              <div>購物車</div>
+            </NavRight>
+          )}
 
           {user && <NavRight to="/userArea" $active={location.pathname === '/userArea'}>
             <div><FontAwesomeIcon icon={faUser} style={{color: "#2f96a9", fontSize: "24px"}} /></div>

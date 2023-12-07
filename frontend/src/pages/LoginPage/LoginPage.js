@@ -5,6 +5,8 @@ import { login } from '../../WebAPI';
 import { setAuthToken } from '../../constants/utils';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const Root = styled.div`
   display: flex;
@@ -60,6 +62,16 @@ const Input = styled.input`
   font-size: 16px;
 `;
 
+const TogglePasswordButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin-left: -20px; /*調整 icon 與密碼輸入框的距離*/
+  color: grey;
+`;
+
 const Button = styled.button`
   background-color: rgb(47, 150, 169);
   color: #fff;
@@ -99,6 +111,7 @@ export default function LoginPage() {
   const [user_name, setUsername] = useState('');
   const [user_password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState();
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -131,6 +144,11 @@ export default function LoginPage() {
   const handleRegister = () => {
     navigate("/register");
   }
+  //隱藏、顯示密碼
+  const togglePasswordVisibility = (e) => {
+    e.preventDefault();
+    setPasswordVisible(!passwordVisible);
+  };
   return (
     <Root>
       <LoginContainer>
@@ -141,7 +159,10 @@ export default function LoginPage() {
             <Input type="text" value={user_name} onChange={e => setUsername(e.target.value)} id="user_name" placeholder="請輸入帳號" required="required"/>
           </FormGroup>
           <FormGroup>           
-            <Input type="password" value={user_password} onChange={e => setPassword(e.target.value)} id="user_password" placeholder="請輸入密碼" required="required"/>
+            <Input type={passwordVisible ? 'text' : 'password'} value={user_password} onChange={e => setPassword(e.target.value)} id="user_password" placeholder="請輸入密碼" required="required"/>
+            <TogglePasswordButton onClick={togglePasswordVisibility}>
+            <FontAwesomeIcon icon={passwordVisible ? faEye : faEyeSlash} />
+            </TogglePasswordButton>
           </FormGroup>
           <Button type="button" onClick={handleSubmit} style={{ margin: "20px 0px" }}>登入</Button>
           <ButtonContainer>

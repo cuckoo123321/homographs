@@ -120,6 +120,7 @@ export default function RegistrationPage() {
   const [user_birthdate, setBirthdate] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -137,7 +138,7 @@ export default function RegistrationPage() {
     if (!usernameRegex.test(user_name)) {
       if (user_name.length < 6) {
         // 帳號長度不夠
-        setErrorMessage('帳號長度需至少為 6 個字符');
+        setErrorMessage('帳號長度需至少為 6 個字元');
       } else {
         // 帳號未同時包含英文和數字
         setErrorMessage('帳號需同時包含英文和數字');
@@ -149,12 +150,17 @@ export default function RegistrationPage() {
     if (!passwordRegex.test(user_password)) {
       if (user_password.length < 8) {
         // 密碼長度不夠
-        setErrorMessage('密碼長度需至少為 8 個字符');
+        setErrorMessage('密碼長度需至少為 8 個字元');
       } else {
         // 密碼未同時包含大小寫英文、數字和特殊字元
         setErrorMessage('密碼需同時包含大小寫英文、數字和特殊字元');
       }
       //setErrorMessage('密碼格式不正確');
+      return;
+    }
+     // 檢查第二次輸入的密碼是否與第一次相同
+    if (user_password !== confirmPassword) {
+      setErrorMessage('兩次輸入的密碼不一致');
       return;
     }
 
@@ -217,7 +223,8 @@ export default function RegistrationPage() {
   };
 
   //隱藏、顯示密碼
-  const togglePasswordVisibility = () => {
+  const togglePasswordVisibility = (e) => {
+    e.preventDefault();
     setPasswordVisible(!passwordVisible);
   };
 
@@ -250,6 +257,19 @@ export default function RegistrationPage() {
             />
             <TogglePasswordButton onClick={togglePasswordVisibility}>
             <FontAwesomeIcon icon={passwordVisible ? faEye : faEyeSlash} />
+            </TogglePasswordButton>
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="confirm_password">確認<span className="required-star">*</span></Label>
+            <Input
+              type={passwordVisible ? 'text' : 'password'}
+              placeholder="再次輸入密碼以確認"
+              required="required"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <TogglePasswordButton onClick={togglePasswordVisibility}>
+              <FontAwesomeIcon icon={passwordVisible ? faEye : faEyeSlash} />
             </TogglePasswordButton>
           </FormGroup>
           <FormGroup>
