@@ -228,6 +228,27 @@ const productController = {
             }
         });
     },
+
+    //前端用的API
+    getProductById: (req, res) => {
+        const product_id = req.params.id;
+        
+        productModel.getProductById(product_id, (err, product) => {
+            if (err) {
+                if (err.message === 'Product not found') {
+                    // 找不到商品的處理方式
+                    res.status(404).json({ error: 'Product not found' });
+                } else {
+                    // 其他資料庫錯誤的處理方式
+                    res.status(500).json({ error: 'Internal Server Error' });
+                }
+            } else {
+                res.json(product);
+            }
+        });
+    }
+    
+      
 }
 
 module.exports = productController;

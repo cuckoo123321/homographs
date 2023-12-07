@@ -163,23 +163,39 @@ const userController = {
 
     getUserInfo: async (req, res) => {
         try {
-            // 從 JWT 中解析使用者 ID
-            const userId = req.user.user_id;
-
-            // 使用 userId 從數據庫中獲取使用者信息
-            const userData = await userModel.getUserById(userId);
-
-            if (!userData) {
+          // 從 JWT 中解析使用者 ID
+          const userId = req.user.userId;
+      
+          // 使用 userId 從數據庫中獲取使用者信息
+          userModel.getUserById(userId)
+            .then(userData => { 
+              if (!userData) {
                 return res.status(404).json({ success: false, message: '查無使用者' });
-            }
-
-            // 返回使用者信息
-            res.status(200).json({ success: true, user: userData });
+              }
+      
+              // 返回使用者信息
+              res.status(200).json({ success: true, user: userData });
+            })
+            .catch(error => {
+              console.error('獲取使用者信息失敗:', error);
+      
+              if (error instanceof jwt.JsonWebTokenError) {
+                console.error('JWT 驗證錯誤:', error.message);
+              }
+      
+              res.status(500).json({ success: false, message: '伺服器錯誤' });
+            });
         } catch (error) {
-            console.error('獲取使用者信息失敗:', error);
-            res.status(500).json({ success: false, message: '伺服器錯誤' });
+          console.error('獲取使用者信息失敗:', error);
+      
+          if (error instanceof jwt.JsonWebTokenError) {
+            console.error('JWT 驗證錯誤:', error.message);
+          }
+      
+          res.status(500).json({ success: false, message: '伺服器錯誤' });
         }
-    },
+      },
+      
 
     //前端註冊會員
     userRegister: async (req, res) => {
@@ -226,7 +242,69 @@ const userController = {
             }
           });
         });
-      }
+      },
+
+      //前端修改會員
+      FrontendHandleUpdate: (req, res) => {
+        // 檢查新密碼是否存在，如果不存在，使用舊密碼
+    const newPassword = req.body.user_password !== undefined ? req.body.user_password : req.body.old_user_password;
+        console.log('Received PUT request:', req.body);//要刪除
+
+        // 檢查新密碼格式
+        //const newPassword = req.body.user_password;
+        console.log('New password:', newPassword);//要刪除
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        if (!passwordRegex.test(newPassword)) {
+            console.log('新密碼格式不正確')//delete
+            return res.status(400).json({ success: false, message: '新密碼格式不正確' });
+        }
+
+        // 檢查 Email 格式
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(req.body.user_email)) {
+            console.log('email 不正確')//delete
+            return res.status(400).json({ success: false, message: 'Email 格式不正確' });
+        }
+
+        bcrypt.hash(req.body.user_password, saltRounds, (err, hash) => {
+            if (err) return res.status(500).json({ error: 'Hashing error' });    
+            console.log('Hashed password:', hash);//delete
+
+            
+            // 轉換日期格式
+            const user_birthdate = new Date(req.body.user_birthdate).toISOString().split('T')[0];
+            const user_updated_at = new Date();
+
+            userModel.FrontendUpdate(
+                req.body.user_name,
+                hash,
+                req.body.user_email,
+                req.body.user_gender,
+                user_birthdate,
+                user_updated_at,
+                req.params.id,
+                (err, results) => {
+                    if (err) {
+                        console.log('Error:', err);
+                        return res.status(500).json({ error: 'Database error' });
+                    } else {
+                        // 如果您想返回更新後的使用者資料，可以在此處獲取資料並返回
+                        console.log('Update results:', results);//delete
+                        userModel.getUserById(req.params.id)
+                        .then(user => {                            
+                            res.status(200).json({ success: true, message: 'User updated successfully', user });
+                        })
+                        .catch(err => {
+                            console.log('Error getting user by ID:', err);
+                            res.status(500).json({ error: 'Database error' });
+                        });
+                    }
+                }
+            );
+        });
+    }
+    
 }
 
 module.exports = userController;

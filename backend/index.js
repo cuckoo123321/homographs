@@ -79,8 +79,8 @@ app.get('/delete_user/:id', userController.softDelete);
 //user前端用 API
 app.post('/userLogin', userController.userLogin);
 app.get('/user', userController.getUserInfo);
-//註冊user
 app.post('/userRegister', userController.userRegister);
+app.put('/userUpdate/:id', userController.FrontendHandleUpdate);
 
 //product
 app.get('/productAdd', productController.add);
@@ -89,6 +89,8 @@ app.get('/productList', productController.getAll);
 app.get('/update_product/:id', productController.update);
 app.post('/update_product/:id', productController.handleUpdate);
 app.get('/delete_product/:id', productController.delete);
+//product前端用API
+app.get('/:id', productController.getProductById);
 
 //productReview
 app.get('/productReviewList', productReviewController.getAll);

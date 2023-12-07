@@ -84,24 +84,24 @@ const userModel = {
         );
     },
 
-    // getUserData: (username) => {
-    //     return new Promise((resolve, reject) => {
-    //         db.query(
-    //             'SELECT * FROM users WHERE user_name = ?',
-    //             [username],
-    //             (err, results) => {
-    //                 if (err) {
-    //                     return reject({ success: false, message: '伺服器錯誤' });
-    //                 }
-    //                 if (results.length === 0) {
-    //                     return reject({ success: false, message: '帳號或密碼錯誤' });
-    //                 }
-    //                 const user = results[0];
-    //                 resolve(user);
-    //             }
-    //         );
-    //     });
-    // },
+    getUserById: async (userId) => {
+        return new Promise((resolve, reject) => {
+          db.query(
+            'SELECT * FROM users WHERE user_id = ?',
+            [userId],
+            (err, results) => {
+              if (err) {
+                reject({ success: false, message: '伺服器錯誤' });
+              } else if (results.length === 0) {
+                reject({ success: false, message: '查無使用者' });
+              } else {
+                const user = results[0];                
+                resolve(user);
+              }
+            }
+          );
+        });
+      },
     
 
     registerUser: (user_name, user_password, user_email, user_gender, user_birthdate) => {
@@ -137,6 +137,17 @@ const userModel = {
             // 否則返回 false，表示帳號不存在
             return cb(null, results.length > 0);
           }
+        );
+    },
+
+    FrontendUpdate: (user_name, user_password, user_email, user_gender, user_birthdate, user_updated_at, user_id, cb) => {
+        db.query(
+            `UPDATE users SET user_name = ?, user_password = ?, user_email = ?, user_gender = ?, user_birthdate = ?, user_updated_at = ? WHERE user_id = ?`,
+            [user_name, user_password, user_email, user_gender, user_birthdate, user_updated_at, user_id],
+            (err, results) => {
+                if (err) return cb(err);
+                cb(null, results);
+            }
         );
     },
 

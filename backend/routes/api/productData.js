@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const productModel = require('../../models/productModel');
+const productController = require('../../controllers/productController');
 
 // Endpoint to get product data
 router.get('/product', async (req, res) => {
@@ -12,5 +13,7 @@ router.get('/product', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+router.get('/:id', productController.getProductById);
 
 module.exports = router;
