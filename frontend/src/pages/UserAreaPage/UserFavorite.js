@@ -3,8 +3,10 @@ import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import {  useLocation } from "react-router-dom";
 import UserNav from './UserNav';
-import { fetchProductData } from '../../WebAPI';
+import { fetchProductData, getFavoriteList, removeFromFavorites, addToCart } from '../../WebAPI';
 import { Link } from 'react-router-dom';
+import { useContext } from 'react'; //用於在函式組件中存取上下文
+import { AuthContext } from '../../contexts'; //存儲和共享身份驗證相關資訊的上下文
 
 const Root = styled.div`
   display: flex;
@@ -109,82 +111,74 @@ export default function UserFavoritePage () {
     const location = useLocation();
     const [favorites, setFavorites] = useState([]);
     const [productData, setProductData] = useState([]);
+    const { user } = useContext(AuthContext);
 
 
     useEffect(() => {
-        // 從 localStorage 中獲取目前的收藏清單
-        const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        setFavorites(storedFavorites);
-    }, []);
-
-    useEffect(() => {
-        const fetchData = async () => {
-          try {
-            // 獲取所有收藏商品的商品數據
-            const products = await fetchProductData();
-    
-            // 根據收藏的ID篩選商品
-            const favoriteProducts = products.filter((product) =>
-              favorites.includes(product.product_id)
-            );
-    
-            // 用獲取到的商品數據更新狀態
-            setProductData(favoriteProducts);
-          } catch (error) {
-            console.error('獲取商品數據時出錯:', error);
-          }
-        };
-    
-        // 在收藏清單改變時獲取數據
-        fetchData();
-      }, [favorites]);
-    
-      const handleRemoveFavorite = (productId) => {
-            // 使用 window.confirm 彈出確認框
-            const userConfirmed = window.confirm('確定取消收藏？');
-        
-            // 如果使用者確認，則執行取消收藏的操作
-            if (userConfirmed) {
-                // 移除收藏
-                const updatedFavorites = favorites.filter((id) => id !== productId);
-                setFavorites(updatedFavorites);
-        
-                // 將更新後的收藏清單存回 localStorage
-                localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-            }
-        };
-
-      const handleAddToCart = (productId, productTitle, productDiscount) => {
-        try {
-            // 從 localStorage 中獲取購物車清單
-            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    
-            // 檢查商品是否已在購物車中
-            const existingItem = cartItems.find((item) => item.product_id === productId);
-    
-            if (existingItem) {
-                // 如果已經在購物車中，更新購買數量
-                existingItem.quantity += 1;
+        fetchProductData().then((data) => setProductData(data));
+        if (user) {
+          getFavoriteList(user.user_id).then((response) => {
+            // 檢查 response 中的 success，確保成功取得資料
+            if (response.success) {
+              // 將收藏清單設定為 response.data
+              setFavorites(response.data);
             } else {
-                // 否則加入購物車，預設商品數量為1
-                const newItem = {
-                    product_id: productId,
-                    quantity: 1,
-                    product_title: productTitle,
-                    product_discount: productDiscount
-                };
-                cartItems.push(newItem);
+              console.error('Failed to get favorites:', response.error);
             }
-    
-            // 將更新後的購物車清單存回 localStorage
-            localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    
-            // 提示成功加入購物車
-            alert('成功加入購物車');
-        } catch (error) {
-            console.error('Error updating cart:', error);
+          });
         }
-    };
+      }, [user]);
+
+      const handleRemoveFavorite = async (favorite_id) => {
+        // 使用 window.confirm 彈出確認框
+        const userConfirmed = window.confirm('確定取消收藏？');
+        if (userConfirmed) {
+            try {
+              await removeFromFavorites(favorite_id);
+              alert('成功移除收藏');              
+        
+              // 刷新收藏清單
+              if (user) {
+                const response = await getFavoriteList(user.user_id);
+                // 檢查 response 中的 success，確保成功取得資料
+                if (response.success) {
+                  // 將收藏清單設定為 response.data，轉換為陣列
+                  setFavorites(Object.values(response.data));
+                } else {
+                  console.error('Failed to get favorites:', response.error);
+                }
+              }
+            } catch (error) {
+              console.error('移除收藏失敗:', error);
+            }
+          }
+      };
+    
+      const handleAddToCart = async (product_id, quantity) => {
+        try {
+          // 使用 addToCart API 將商品加入購物車
+          const response = await addToCart(user.user_id, product_id, quantity, user.token);
+    
+          // 判斷 addToCart API 的回傳是否成功
+          if (response.success) {
+            alert('成功加入購物車');
+            // 可以更新購物車數量等相關資訊
+            // setCartItems(response.data); // 這裡需要根據實際情況來更新購物車數量或資訊
+          } else {
+            // 判斷是否為唯一鍵衝突
+            if (response.error && response.error.code === 'ER_DUP_ENTRY') {
+              alert('該商品已存在購物車中');
+            } else {
+              console.error('添加到購物車失敗:', response.error);
+              alert('添加到購物車失敗');
+            }
+          }
+        } catch (error) {
+          console.error('Error handling add to cart:', error);
+        }
+      };
+    
+      
 
     return (
         <Root>
@@ -195,31 +189,30 @@ export default function UserFavoritePage () {
                 {favorites.length === 0 ? (
                     <Alert>您尚未收藏任何商品</Alert>
                 ) : (
-                    favorites.map((productId, index) => {
-                    // 查找當前收藏的商品數據
-                    const product = productData.find((p) => p.product_id === productId);
-
-                    return (
-                        <FavoriteItem key={productId}>
-                        <Index>{`#${index + 1}`}</Index>
-                        {product && (
-                            <>
-                            <Link to={`/product/${product.product_id}`} style={{textDecoration: "none", color: "rgb(60, 60, 60)"}}>
-                            <InfoContainer >
-                                <ProductTitle>{product.product_title}</ProductTitle>
-                                <ProductDiscount>NT{product.product_discount}元</ProductDiscount>
-                            </InfoContainer>
-                            </Link>
-                            </>
-                        )}
-                        <ButtonContainer>
-                        <Button onClick={() => handleAddToCart(product.product_id, product.product_title, product.product_discount)}>加入購物車</Button>
-                            <Button onClick={() => handleRemoveFavorite(productId)}>取消收藏</Button>
-                        </ButtonContainer>
-                        
-                        </FavoriteItem>
-                    );
-                    })
+                    favorites.map((favorite, index) => {
+                        // 查找當前收藏的商品數據
+                        const product = productData.find((p) => p.product_id === favorite.product_id);
+                      
+                        return (
+                          <FavoriteItem key={favorite.favorite_id}>
+                            <Index>{`#${index + 1}`}</Index>
+                            {product && (
+                              <>
+                                <Link to={`/product/${product.product_id}`} style={{ textDecoration: "none", color: "rgb(60, 60, 60)" }}>
+                                  <InfoContainer>
+                                    <ProductTitle>{product.product_title}</ProductTitle>
+                                    <ProductDiscount>NT{product.product_discount}元</ProductDiscount>
+                                  </InfoContainer>
+                                </Link>
+                              </>
+                            )}
+                            <ButtonContainer>
+                              <Button onClick={() => handleAddToCart(product.product_id, 1)}>加入購物車</Button>
+                              <Button onClick={() => handleRemoveFavorite(favorite.favorite_id)}>取消收藏</Button>
+                            </ButtonContainer>
+                          </FavoriteItem>
+                        );
+                      })
                 )}
             </UserFavoriteContainer>
       </Root>

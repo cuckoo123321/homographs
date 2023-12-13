@@ -12,7 +12,7 @@ import LoginPage from '../../pages/LoginPage';
 import RegisterPage from '../../pages/RegisterPage/index';
 import { UserAreaPage, UserEdit, UserFavorite } from '../../pages/UserAreaPage/index';
 import { ProductPage, SingleProductPage } from '../../pages/ProductPage/index';
-import CheckOutPage from '../../pages/CheckOutPage/index'
+import { CheckOutPage, ShippingAddress, Payment } from '../../pages/CheckOutPage/index';
 
 
 
@@ -24,10 +24,12 @@ import { getAuthToken } from '../../constants/utils';
 const Root = styled.div``
 
 function App() {
-  const [user, setUser] = useState(null);  
+  const [user, setUser] = useState(null); 
+
 
   useEffect(() => {
     const fetchData = async () => {
+      
       const token = getAuthToken();
       if (token) {
         // 有 Token 時才調用 API
@@ -40,17 +42,21 @@ function App() {
             setUser(null);
             // 在此處清空購物車的本地存儲數據
             localStorage.removeItem('cartItems');
+            window.alert('驗證失敗，請重新登入');
           }
         } catch (error) {
           console.error('驗證期間發生錯誤:', error);
           setUser(null); // 在錯誤時也設置 user 為 null
           // 在此處清空購物車的本地存儲數據
           localStorage.removeItem('cartItems');
+          window.alert('驗證期間發生錯誤，請重新登入');
         }
       }else {
         // 無 Token，表示用戶已登出或 token 失效
         // 在此處清空購物車的本地存儲數據
         localStorage.removeItem('cartItems');
+        // 驗證時間超時，顯示提示彈窗
+        window.alert('驗證已逾時，請重新登入');
       }
     };
   
@@ -59,24 +65,27 @@ function App() {
   
   
   return (
-    <AuthContext.Provider value={{user, setUser}}>
-    <Root>
-      <Router>
-        <Header/>
-        <Routes>
-          <Route element={<HomePage />} path="/"/>
-          <Route  element={<ProductPage />} path="/product"/>
-          <Route  element={<SingleProductPage />} path="/product/:product_id"  />
-          <Route  element={<EventPage />} path="/event"/>
-          <Route  element={<LoginPage />} path="/login"/>
-          <Route  element={<RegisterPage />} path="/register"/>
-          <Route element={<UserAreaPage />} path="/userArea"/>
-          <Route element={<UserEdit />} path="/userEdit"/>
-          <Route element={<UserFavorite />} path="/userFavorite"/>
-        </Routes>
-         <Footer/> 
-      </Router>          
-    </Root>
+    <AuthContext.Provider value={{user, setUser }}> 
+        <Root>
+          <Router>
+            <Header/>
+            <Routes>
+              <Route element={<HomePage />} path="/"/>
+              <Route  element={<ProductPage />} path="/product"/>
+              <Route  element={<SingleProductPage />} path="/product/:product_id"  />
+              <Route  element={<EventPage />} path="/event"/>
+              <Route  element={<LoginPage />} path="/login"/>
+              <Route  element={<RegisterPage />} path="/register"/>
+              <Route element={<UserAreaPage />} path="/userArea"/>
+              <Route element={<UserEdit />} path="/userEdit"/>
+              <Route element={<UserFavorite />} path="/userFavorite"/>
+              <Route element={<CheckOutPage />} path="/checkOut"/>
+              <Route element={<ShippingAddress />} path="/shippingAddress"/>
+              <Route element={<Payment />} path="/payment"/>
+            </Routes>
+            <Footer/> 
+          </Router>          
+        </Root>
     </AuthContext.Provider>
   )
 }

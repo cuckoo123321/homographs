@@ -177,6 +177,9 @@ export default function UserEdit () {
                     setEditedUserData(response.user);
                 } else {
                     console.error('獲取使用者資料失敗:', response.message);
+                    // API 回應中 success 為 false，表示身份驗證已經失效
+                    window.alert('身份驗證已逾時，請重新登入');
+                    navigate('/login'); // 將用戶導向登入頁面
                 }
             } catch (error) {
                 console.error('發生錯誤:', error);

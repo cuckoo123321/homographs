@@ -1,9 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
-
+import { useNavigate } from 'react-router-dom';
+import { getCart, updateCartQuantity, deleteCartItem } from '../../WebAPI';
+import { AuthContext } from '../../contexts'; //存儲和共享身份驗證相關資訊的上下文
 
 const Overlay = styled.div`
   position: fixed;
@@ -24,6 +26,7 @@ const PopoverContainer = styled.div`
   background-color: #fff;
   padding: 30px;
   border-radius: 8px;
+  cursor: auto;
   z-index: 1001; /*蓋在overlay之上*/
 `;
 
@@ -34,31 +37,42 @@ const Title = styled.div`
     text-align: center;
     margin-bottom: 20px;
 `;
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+`;
 
-const ProductItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
+const TableRow = styled.tr`
+  border-bottom: 1px solid #ddd;
+`;
+
+const TableCell = styled.td`
+  padding: 10px;
   color: rgb(60, 60, 60);
-`;
- 
-const ProductTitle = styled.div`
-    width:300px;
+
 `;
 
-const ProductDiscount = styled.div`
-    
+const QuantityCell = styled(TableCell)`
+  display: flex;
+  align-items: center;
 `;
-const ProductPrice = styled.div`
-    color: rgb(173 62 74);
-    &:before{
-        color: rgb(60, 60, 60);
-        content: '小計 '
-    }
-    &:after{
-        color: rgb(60, 60, 60);
-        content: ' 元'
-    }
+
+const QuantityButton = styled.button`
+    border: none;
+    border-radius: 3px;
+    background: rgba(47, 150, 169, 0.3);
+    text-align: center;
+    cursor: pointer;
+    font-size: 18px;
+`;
+
+const QuantityInput = styled.input`
+  width: 60px;
+  text-align: center;
+  border: 1px solid rgba(47, 150, 169);
+  border-radius: 3px;
+  margin: 0 8px;
 `;
 
 const RemoveButton = styled.button`
@@ -68,35 +82,20 @@ const RemoveButton = styled.button`
   cursor: pointer;
 `;
 
+const PriceButtonContainer = styled.div`
+  width: 690px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const TotalPrice = styled.div`
     color: rgb(173 62 74);
     font-size: 20px;
 `;
 
-const QuantityContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: start;
-  margin-right: 20px; 
-`;
-
-const QuantityButton = styled.div`
-    width:20px;
-    border: none;
-    border-radius: 3px;
-    background: rgba(47, 150, 169, 0.3);
-    text-align: center;
-`;
-
-const QuantityInput = styled.input`
-  width: 40px;
-  text-align: center;
-  border: 1px solid rgba(47, 150, 169);
-  border-radius: 3px;
-  margin: 0 8px;
-`;
-
 const Alert = styled.div`
+  text-align: center;
   margin-top: -25px;
 `;
 
@@ -108,7 +107,7 @@ const CheckoutButton = styled.button`
   border-radius: 5px;
   padding: 8px;
   cursor: pointer;
-  width: 100%;
+  width: 200px;
   margin-top:20px;
   letter-spacing: 1rem;
   &:hover{
@@ -116,94 +115,191 @@ const CheckoutButton = styled.button`
   }
 `;
 
-export default function ShoppingCartPopover ({ cartItems, setCartItems, onRemove, onCheckout }) {
+export default function ShoppingCartPopover () {
+    const navigate = useNavigate();
+    const [cartItems, setCartItems] = useState([]);
+    const { user } = useContext(AuthContext);
+    const [totalCartPrice, setTotalCartPrice] = useState(0);
+    const [ cartItemsCount, setCartItemsCount] = useState(0);
 
     //防止一按到頁面就關閉
     const stopPropagation = (e) => {
         e.stopPropagation();
       };
 
-    // 計算購物車總價
-    const calculateTotalPrice = () => {
-        return cartItems.reduce((total, item) => {
-            const itemPrice = item.product_discount * item.quantity;
-            return total + itemPrice;
-        }, 0);
-    };
-
     useEffect(() => {
-        // 在 cartItems 更新後觸發
-        // 在這裡執行可能需要即時更新的邏輯
-      }, [cartItems]);
+      // 確保 user 存在
+      if (user) {
+        getCart(user.user_id, user.token)
+          .then((response) => {
+            // 檢查 response 中的 success，確保成功取得資料
+            if (response.success) {
+              // 將購物車內容設定為 response.data
+              setCartItems(response.data);
+              // 計算總價
+              const total = response.data.reduce((acc, item) => acc + item.product_discount * item.quantity, 0);
+              setTotalCartPrice(total);
+            } else {
+              console.error('Failed to get cart items:', response.error);
+            }
+          })
+          .catch((error) => {
+            console.error('Error fetching cart items:', error);
+          });
+      }
+    }, [user]);
 
-      const handleQuantityChange = (productId, newQuantity) => {
-        // 限制數量不小於 1
-        newQuantity = Math.max(1, newQuantity);
-        const updatedCartItems = cartItems.map((item) => {
-          if (item.product_id === productId) {
-            return { ...item, quantity: newQuantity };
-          }
-          return item;
-        });
+    //改變數量
+    const handleQuantityChange = async (productId, newQuantity) => {
+      try {
+
+        // 判斷新數量是否合法
+        if (newQuantity < 1) {
+          alert('數量不能小於1');
+          return;
+        }
     
-        setCartItems(updatedCartItems);
-        localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
-      };
+        // 判斷新數量是否超過庫存
+        const product = cartItems.find((item) => item.product_id === productId);
+        if (newQuantity > product.product_stock) {
+          alert('購買數量超過庫存');
+          return;
+        }
+    
+        // 使用 API 更新購物車中商品的數量
+        const response = await updateCartQuantity(user.user_id, productId, newQuantity, user.token);
+    
+        if (response.success) {
+          // 更新本地購物車數據
+          const updatedCartItems = cartItems.map((item) =>
+            item.product_id === productId ? { ...item, quantity: newQuantity } : item
+          );
+          setCartItems(updatedCartItems);
 
+          // 計算新的總金額
+          const newTotalCartPrice = updatedCartItems.reduce((total, item) => {
+            return total + item.product_discount * item.quantity;
+          }, 0);
+          setTotalCartPrice(newTotalCartPrice);
+        } else {
+          console.error('Failed to update cart quantity:', response.error);
+          alert('更新購物車數量失敗');
+        }
+      } catch (error) {
+        console.error('Error handling quantity change:', error);
+      }
+    };
+    
+    // 從購物車移除商品
+    const handleRemoveItems = async ({ product_id, product_discount, quantity }) => {
+      try {
+        // 判斷是否有使用者登入
+        if (!user) {
+          alert('請先登入會員');
+          navigate("/login");
+          return;
+        }
+
+        // 確認是否移除商品
+        const confirmRemove = window.confirm('確定將該商品購物車中移除？');
+        if (!confirmRemove) {
+          return;
+        }
+
+        // 使用 deleteCartItem API 刪除購物車商品
+        const response = await deleteCartItem(user.user_id, product_id);
+
+        // 判斷 deleteCartItem API 的回傳是否成功
+        if (response.success) {
+          // 更新本地購物車數據，刪除對應商品
+          const updatedCartItems = cartItems.filter((item) => item.product_id !== product_id);
+          setCartItems(updatedCartItems);
+
+          // 計算新的總金額
+          const newTotalCartPrice = updatedCartItems.reduce((total, item) => {
+            return total + item.product_discount * item.quantity;
+          }, 0);
+          setTotalCartPrice(newTotalCartPrice);
+
+          // 更新購物車數量
+          setCartItemsCount((prevCount) => prevCount - 1);
+        } else {
+          console.error('移除購物車商品失敗:', response.error);
+          alert('移除購物車商品失敗');
+        }
+      } catch (error) {
+        console.error('Error handling remove items:', error);
+      }
+    };
+  
+    const handleCheckoutClick = () => {
+      navigate('/checkOut');
+    };
+    
     return (
-        
-        <Overlay>   
-            <div onClick={stopPropagation}>         
-             <PopoverContainer>
-                    <Title>購物車清單</Title>
-                {cartItems.map((item) => (                    
-                    <ProductItem key={item.product_id}>
-                        <ProductTitle>{item.product_title}</ProductTitle>
-                        
-                        {/* 增減商品數量 */}
-                        <QuantityContainer>
-                            <QuantityButton
-                                onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}
-                                disabled={item.quantity <= 1}
-                            >
-                                -
-                            </QuantityButton>
-                            <QuantityInput
-                                type="number"
-                                value={item.quantity}
-                                onChange={(e) =>
-                                handleQuantityChange(item.product_id, parseInt(e.target.value, 10))
-                                }
-                            />
-                            <QuantityButton onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}>
-                                +
-                            </QuantityButton>
-                        </QuantityContainer>
+      <Overlay>
+        <div onClick={stopPropagation}>
+          <PopoverContainer>
+            <Title>購物車清單</Title>
+            
+              {cartItems.length === 0 ? (
+                <Alert>購物車是空的</Alert>
+              ) : (
+                <>
+                <Table>
+                  <thead>
+                    <TableRow style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center" }}>
+                      <TableCell>商品</TableCell>
+                      <TableCell>數量</TableCell>
+                      <TableCell>單價</TableCell>
+                      <TableCell>小計</TableCell>
+                      <TableCell>移除</TableCell>
+                    </TableRow>
+                  </thead>
+                  <tbody>
+                    {cartItems.map((product) => (
+                      <TableRow key={product.product_id}>
+                        <TableCell>{product.product_title}</TableCell>
+                        <QuantityCell>
+                          <QuantityButton
+                            onClick={() => handleQuantityChange(product.product_id, product.quantity - 1)}
+                            disabled={product.quantity <= 1}
+                          >
+                            －
+                          </QuantityButton>
+                          <QuantityInput
+                            type="text"
+                            value={product.quantity}
+                            readOnly
+                          />
 
-                        <ProductDiscount>單價 {item.product_discount} 元</ProductDiscount>  
-                        <ProductPrice>{item.product_discount * item.quantity}</ProductPrice>                       
-                        <RemoveButton onClick={() => {
-                            onRemove(item.product_id);
-                            // 更新 Header.js 中的 cartItems 狀態
-                            setCartItems(updatedCartItems => updatedCartItems.filter(updatedItem => updatedItem.product_id !== item.product_id));
-                        }}>
-                        <FontAwesomeIcon icon={faTrashCan} style={{ color: 'rgb(202, 74, 88,0.9)', fontSize: '24px' }} />
-                    </RemoveButton>
-                    </ProductItem>
-                ))}
-                {cartItems.length === 0 ? (
-                    <Alert>購物車是空的</Alert>
-                ) : (
-                    <>
-                        <TotalPrice>總價 NT {calculateTotalPrice()} 元</TotalPrice>
-                        <CheckoutButton onClick={onCheckout}>結帳</CheckoutButton>
-                    </>
-                )}
-                </PopoverContainer> 
-            </div>                  
-        </Overlay>
-       
-        
+                          <QuantityButton
+                            onClick={() => handleQuantityChange(product.product_id, product.quantity + 1)}
+                            disabled={product.quantity >= product.product_stock}
+                          >
+                            ＋
+                          </QuantityButton>
+                        </QuantityCell>
+                        <TableCell>{`NT${product.product_discount.toLocaleString()}元`}</TableCell>
+                        <TableCell style={{ color: "rgb(173 62 74)" }}>{`NT${(product.product_discount * product.quantity).toLocaleString()}元`}</TableCell>
+                        <TableCell>
+                          <RemoveButton onClick={() => handleRemoveItems(product)}>
+                            <FontAwesomeIcon icon={faTrashCan} style={{ color: 'rgb(202, 74, 88,0.9)', fontSize: '24px' }} />
+                          </RemoveButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </tbody>
+                </Table>
+                  <PriceButtonContainer>
+                    <TotalPrice>總價 NT{totalCartPrice.toLocaleString()} 元</TotalPrice>
+                    <CheckoutButton onClick={handleCheckoutClick}>結帳</CheckoutButton>
+                  </PriceButtonContainer>
+                </>
+              )}   
+          </PopoverContainer>
+        </div>
+      </Overlay>
     );
   };
   

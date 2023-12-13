@@ -2,8 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { getMe } from '../../WebAPI'; 
-import { useNavigate } from 'react-router-dom';
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from 'react-router-dom';
 import UserNav from './UserNav';
 
 
@@ -116,6 +115,9 @@ export default function UserAreaPage () {
                 setUserData(response.user);
                 } else {
                 console.error('獲取使用者資料失敗:', response.message);
+                // API 回應中 success 為 false，表示身份驗證已經失效
+                window.alert('身份驗證已逾時，請重新登入');
+                navigate('/login'); // 將用戶導向登入頁面
                 }
             } catch (error) {
                 console.error('發生錯誤:', error);

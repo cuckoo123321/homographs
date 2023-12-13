@@ -14,6 +14,7 @@ import { setAuthToken } from '../../constants/utils';//設置 token
 import { useNavigate } from 'react-router-dom';
 import { MEDIA_QUERY_MOBILE, MEDIA_QUERY_TABLET } from '../../constants/style';
 import ShoppingCartPopover from '../../pages/ShoppingCartPopover/index';
+import { getCart } from '../../WebAPI';
 
 const baseLinkStyles = css`
   height: 70px;
@@ -153,20 +154,27 @@ export default function Header() {
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [showPopover, setShowPopover] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItemsCount, setCartItemsCount] = useState(0);
 
   useEffect(() => {
-    // 在組件初次渲染時，從 localStorage 中取出資料
-    const storedCartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    setCartItems(storedCartItems);
-  }, []);
+    // 確保 user 已經被正確設定
+    if (user) {
+      // 使用 API 獲取購物車資訊
+      getCart(user.user_id, user.token)
+        .then((response) => {
+          if (response.success) {
+            // 設定商品品項數量
+            setCartItemsCount(response.data.length);
+          } else {
+            console.error('獲取購物車資訊失敗:', response.error);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching cart information:', error);
+        });
+    }
+  }, [user]);
 
-  const handleRemoveItem = (productId) => {
-    // 處理移除商品的邏輯，同時更新本地和狀態
-    const updatedCartItems = cartItems.filter((item) => item.product_id !== productId);
-    setCartItems(updatedCartItems);
-    localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
-  };
 
   const handleCartClick = () => {
     setShowPopover(!showPopover);
@@ -183,10 +191,6 @@ export default function Header() {
     }    
   };  
 
-  const handleCheckout = () => {
-    // 導向結帳頁面
-    navigate("/checkOut");
-  };
 
    return (
     <StyleSheetManager shouldForwardProp={(prop) => isPropValid(prop)}>
@@ -220,20 +224,13 @@ export default function Header() {
           {user && (
             <NavRight onClick={handleCartClick}>
               <div>
-                {cartItems.length > 0 && (
-                  <Badge>{cartItems.length}</Badge>
-                )}
-
+              {cartItemsCount > 0 && (
+                <Badge>{cartItemsCount}</Badge>
+              )}
                 <FontAwesomeIcon icon={faCartShopping} style={{ color: "#2f96a9", fontSize: "24px" }} />
                 
                 {showPopover && (
-                  <ShoppingCartPopover
-                    // 將購物車資訊傳遞給 ShoppingCartPopover
-                    cartItems={cartItems}
-                    setCartItems={setCartItems} 
-                    onRemove={handleRemoveItem}
-                    onCheckout={handleCheckout}
-                  />
+                  <ShoppingCartPopover/>
                 )}
               </div>
               <div>購物車</div>

@@ -11,6 +11,8 @@ const eventController = require('./controllers/eventController');
 const carouselController = require('./controllers/carouselController');
 const productController = require('./controllers/productController');
 const productReviewController = require('./controllers/productReviewController');
+const favoriteController = require('./controllers/favoriteController');
+const cartController = require('./controllers/cartController');
 const path = require('path');
 const apiRoutes = require('./routes/apiRoutes'); //API路由
 const cors = require('cors'); //同源政策
@@ -111,6 +113,17 @@ app.get('/carouselList', carouselController.getAll);
 app.get('/update_carousel/:id', carouselController.update);
 app.post('/update_carousel/:id', carouselController.handleUpdate);
 app.get('/delete_carousel/:id', carouselController.delete);
+
+//favorite
+app.post('/favoriteAdd', favoriteController.addToFavorites);
+app.get('/favoriteList/:user_id?', favoriteController.getFavorite);
+app.delete('/favoriteRemove/:favorite_id', favoriteController.removeFromFavorites);
+
+//cart
+app.post('/addToCart', cartController.addToCart);
+app.get('/cartList/:user_id?', cartController.getCartItems);
+app.put('/updateQuantity/:user_id/:product_id', cartController.updateCartQuantity);
+app.delete('/deleteCartItem/:user_id/:product_id', cartController.deleteCartItem);
 
 
 //啟動伺服器

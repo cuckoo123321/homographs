@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
-import { getProductById } from '../../WebAPI';
+import { getProductById, addToFavorites, addToCart } from '../../WebAPI';
+import { useContext } from 'react'; //用於在函式組件中存取上下文
+import { AuthContext } from '../../contexts'; //存儲和共享身份驗證相關資訊的上下文
+
 
 const Root = styled.div`
   display: flex;
@@ -164,12 +168,14 @@ const QuantityButton = styled.button`
 
 export default function SingleProductPage ({ setCartItems }){
   const { product_id } = useParams();
+  const { user } = useContext(AuthContext);
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [ cartItemsCount, setCartItemsCount] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // 根據 productId 從 API 中取得商品詳細資訊
-    // 這裡僅為範例，實際上需要調用相應的 API 函數
     const fetchProduct = async () => {
         try {
           const response = await getProductById(product_id);      
@@ -200,69 +206,74 @@ export default function SingleProductPage ({ setCartItems }){
       }
   };
 
-
-// 使用 localStorage 處理收藏功能
-const handleFavorite = (product_id) => {
+  const handleFavorite = async (product_id) => {
     try {
-      // 從 localStorage 中獲取目前的收藏清單
-      const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-  
-      // 檢查商品是否已在收藏清單中
-      const isFavorite = favorites.includes(product_id);
-  
-      if (isFavorite) {
-        // 如果已經在收藏清單中，彈出提示
-        alert('該商品已經在收藏清單中');
-      } else {
-        // 否則加入收藏
-        const updatedFavorites = [...favorites, product_id];
-  
-        // 將更新後的收藏清單存回 localStorage
-        localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-  
-        // 更新前端的收藏狀態，可選擇重新載入收藏清單或使用其他方式
-        // updateFavorites();
-        alert('成功收藏該商品，請至會員專區查看收藏清單');
+      if (!user || !user.user_id) {
+        console.error('無法獲取使用者資訊');
+        return;
       }
+
+      // 使用 Web API 將商品加入收藏清單
+      //const result = await addToFavorites({ user_id: user.user_id, product_id });
+      //console.log('成功加入收藏清單:', result);
+      await addToFavorites({ user_id: user.user_id, product_id });
+      alert('成功加入收藏清單');
+      
+
+      // 在這裡你可以更新收藏清單狀態或顯示相應的提示
     } catch (error) {
-      console.error('Error updating favorites:', error);
+      // 如果錯誤是由於唯一鍵衝突引起的
+      if (error.response && error.response.status === 400) {
+        alert('該商品已存在收藏清單中');
+        console.log('該商品已存在收藏清單中:', error);
+      } else {
+        // 其他錯誤的處理
+        alert('添加到收藏清單失敗');
+        console.error('加入收藏清單失敗:', error);
+      }
     }
   };
 
-    const handleAddToCart = (productId, productTitle, productDiscount, selectedQuantity) => {
-        try {
-            // 從 localStorage 中獲取購物車清單
-            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    
-            // 檢查商品是否已在購物車中
-            const existingItem = cartItems.find((item) => item.product_id === productId);
-    
-            if (existingItem) {
-                // 如果已經在購物車中，更新購買數量
-                existingItem.quantity += selectedQuantity;
-            } else {
-                // 否則加入購物車
-                const newItem = {
-                    product_id: productId,
-                    quantity: selectedQuantity,
-                    product_title: productTitle,
-                    product_discount: productDiscount
-                };
-                cartItems.push(newItem);
-            }
-    
-            // 將更新後的購物車清單存回 localStorage
-            localStorage.setItem('cartItems', JSON.stringify(cartItems));
-            // 提示成功加入購物車
-            alert('成功加入購物車');
-            // 更新 Header.js 中的 cartItems 狀態
-            setCartItems(cartItems);
-    
-            
-        } catch (error) {
-            console.error('Error updating cart:', error);
+  const handleAddToCart = async (product_id, quantity) => {
+    try {
+      // 判斷是否有使用者登入
+      if (!user) {
+        alert('請先登入會員');
+        navigate("/login");
+        return;
+      }
+
+      // 使用 getProductById 取得商品資訊
+      const productData = await getProductById(product_id);
+      const product = await productData.json(); // 轉換為 JSON 格式
+
+      // 檢查商品庫存
+      if (product && product.product_stock === 0) {
+        alert('該商品已售完，無法購買');
+        return;
+      }
+
+      // 使用 addToCart API 將商品加入購物車
+      const response = await addToCart(user.user_id, product_id, quantity, user.token);
+
+      // 判斷 addToCart API 的回傳是否成功
+      if (response.success) {
+        alert('成功加入購物車');
+        // 更新購物車數量等相關資訊
+        setCartItemsCount((prevCount) => prevCount + 1);
+      } else {
+        // 判斷是否為唯一鍵衝突
+        if (response.error && response.error.code === 'ER_DUP_ENTRY') {
+          alert('該商品已存在購物車中');
+        } else {
+          console.error('添加到購物車失敗:', response.error);
+          alert('添加到購物車失敗');
         }
-    };
+      }
+    } catch (error) {
+      console.error('Error handling add to cart:', error);
+    }
+  };   
 
   return (
     <Root>    
@@ -316,13 +327,10 @@ const handleFavorite = (product_id) => {
             </ItemGroup>
             
           <ButtonGroup>
-            <Button disabled={product.product_stock === 0}>
+            <Button>
                 <FontAwesomeIcon icon={faShoppingCart} style={{ color: 'white', fontSize: '24px' }} />
-                <ButtonLabel onClick={() =>             handleAddToCart(
-                    product.product_id, 
-                    product.product_title,
-                    product.product_discount, 
-                    quantity)}
+                <ButtonLabel onClick={() => handleAddToCart(
+                    product.product_id, quantity)}                    
                     >加入購物車
                 </ButtonLabel>                   
             </Button>
