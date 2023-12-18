@@ -95,7 +95,16 @@
             <% }); %>
           </tbody>
     </table>
-
+    <!-- 分頁 -->
+    <div>
+        <ul class="pagination">
+          <% for(let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                <a class="page-link" href="/event/eventList?page=<%= i %>"><%= i %></a>
+            </li>
+          <% } %>
+        </ul>
+      </div>
     </div>
     <script>
         // alert delete

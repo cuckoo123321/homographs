@@ -15,5 +15,6 @@ router.get('/product', async (req, res) => {
 });
 
 router.get('/:id', productController.getProductById);
+router.put('/update_productStock', productController.updateProductStock);
 
 module.exports = router;

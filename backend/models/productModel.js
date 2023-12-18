@@ -104,33 +104,52 @@ const productModel = {
         );
     },
 
- // Function to get data from the database (API)
-  getProductData: () => {
-    return new Promise((resolve, reject) => {
-      db.query(`SELECT * FROM products WHERE product_publish = 'publish' `, (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(results);
-        }
-      });
-    });
-  },
+    // Function to get data from the database (API)
+    getProductData: () => {
+        return new Promise((resolve, reject) => {
+        db.query(`SELECT * FROM products WHERE product_publish = 'publish' `, (error, results) => {
+            if (error) {
+            reject(error);
+            } else {
+            resolve(results);
+            }
+        });
+        });
+    },
 
-  getProductById: (product_id, cb) => {
-    db.query('SELECT * FROM products WHERE product_id = ?', [product_id], (err, results) => {
-        if (err) {
-            console.error('Database error:', err);
-            return cb(err);
-        }
-        // 檢查是否找到商品
-        if (results.length === 0) {
-            const notFoundError = new Error('Product not found');
-            return cb(notFoundError);
-        }        
-        cb(null, results[0]);// 找到商品，回傳結果
-    });
-}
+    getProductById: (product_id, cb) => {
+        db.query('SELECT * FROM products WHERE product_id = ?', [product_id], (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return cb(err);
+            }
+            // 檢查是否找到商品
+            if (results.length === 0) {
+                const notFoundError = new Error('Product not found');
+                return cb(notFoundError);
+            }        
+            cb(null, results[0]);// 找到商品，回傳結果
+        });
+    },
+
+    updateProductStock: (productId, newStock) => {
+        return new Promise((resolve, reject) => {
+          db.query(
+            'UPDATE products SET product_stock = ? WHERE product_id = ?',
+            [newStock, productId],
+            (err, result) => {
+              if (err) {
+                console.error('Database error:', err);
+                return reject(err);
+              }
+              resolve({
+                success: true,
+                message: 'Product stock updated successfully',
+              });
+            }
+          );
+        });
+    },
 
 
 

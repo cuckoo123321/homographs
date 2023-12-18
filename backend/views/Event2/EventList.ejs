@@ -11,7 +11,7 @@
         <div class="row">
             <div class="col-md-3 d-flex">
                 <a class="btn btn-primary mb-2 add" href="/eventAdd">新增活動</a>
-                <a class="btn btn-primary mb-2" href="/eventList">顯示所有列表</a>
+                <a class="btn btn-primary mb-2" href="/EventList">顯示所有列表</a>
             </div>
         
             <div class="col-md-9">
@@ -96,81 +96,5 @@
           </tbody>
     </table>
 
-    </div>
-    <script>
-        // alert delete
-       function confirmDelete() {
-            return confirm('確定要刪除此活動嗎？');
-        }
-
-        // 權限篩選
-        $('.dropdown-item.permission').click(function(){
-            const selectedPermission = $(this).data('permission');
-            applyFilters(selectedPermission);
-        });
-
-        // 狀態篩選
-        $('.dropdown-item.status').click(function(){
-            const selectedStatus = $(this).data('status');
-            applyFilters(selectedStatus);
-        });
-
-        function applyFilters(selectedValue) {
-            // 先隱藏所有行
-            $('table tbody tr').hide();
-
-            if (selectedValue === 'all') {
-                // 顯示所有行
-                $('table tbody tr').show();
-            } else {
-                // 顯示符合篩選條件的行
-                $(`table tbody tr td:contains("${selectedValue}")`).parent().show();
-            }
-        }
-
-        // 創建時間篩選
-        $('.createdAt').click(function () {
-            const selectedStatus = $(this).data('status');
-            handleDateFilter(selectedStatus);
-            
-        });
-
-        // 更新時間篩選
-        $('.updatedAt').click(function () {
-            const selectedStatus = $(this).data('status');
-            handleDateFilter(selectedStatus);
-            
-        });
-
-        function handleDateFilter(selectedStatus){
-            // 隱藏或顯示符合篩選的行
-            if (selectedStatus === 'all') {
-                $('.dateRow').show(); // 顯示所有行
-            } else {
-                $('.dateRow').hide(); // 隱藏所有行
-                const cutoffDate = new Date();
-
-                // 根據所選擇的篩選條件計算截止日期
-                switch (selectedStatus) {
-                    case 'week':
-                        cutoffDate.setDate(cutoffDate.getDate() - 7);
-                        break;
-                    case 'month':
-                        cutoffDate.setMonth(cutoffDate.getMonth() - 1);
-                        break;
-                    case 'year':
-                        cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
-                        break;
-                }
-
-                // 顯示符合篩選條件的行
-                $('.dateRow').filter(function () {
-                    const createdAt = new Date($(this).data('created-at'));
-                    const updatedAt = new Date($(this).data('updated-at'));
-                    return createdAt >= cutoffDate || updatedAt >= cutoffDate;
-                }).show();
-            }
-        }
-    </script>
 </body>
 </html>

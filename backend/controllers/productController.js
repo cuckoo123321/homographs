@@ -246,7 +246,26 @@ const productController = {
                 res.json(product);
             }
         });
-    }
+    },
+    //訂單成立後自動更新庫存
+    updateProductStock: async (req, res) => {
+        const { productId, newStock } = req.body;
+    
+        try {
+          // 使用 productModel.updateProductStock 更新庫存
+          const result = await productModel.updateProductStock(productId, newStock);
+    
+          console.log('Update product stock result:', result);
+    
+          res.json(result);
+        } catch (error) {
+          console.error('Error updating product stock:', error);
+          res.status(500).json({
+            success: false,
+            error: 'Internal server error',
+          });
+        }
+      },
     
       
 }
