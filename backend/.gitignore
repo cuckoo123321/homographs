@@ -1,7 +1,4 @@
-
-node_modules/
-package-lock.json
-package.json
+node_modules
 .env
 # mac 系統需要隱藏的系統檔案
 .DS_Store
