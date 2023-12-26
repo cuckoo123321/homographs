@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { fetchEventData } from '../../WebAPI';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { MEDIA_QUERY_MOBILE } from '../../constants/style';
 
 
 const Root = styled.div`
@@ -53,6 +54,9 @@ const Label = styled.label`
   color: rgb(47, 150, 169);
   font-size: large;
   font-weight: bold;
+  ${MEDIA_QUERY_MOBILE} {
+    font-size: 0;
+  }
 
 `;
 
@@ -72,6 +76,9 @@ const EventTitle = styled.div`
     color: rgb(47, 150, 169);
     letter-spacing: 0.04em;
     margin-bottom: 40px;
+    ${MEDIA_QUERY_MOBILE} {
+      font-size: 20px;
+    }
 `;
 
 const EventContainer = styled.div`
@@ -96,6 +103,9 @@ const EventCard = styled.div`
 
   &:hover {
     transform: scale(1.05);
+  }
+  ${MEDIA_QUERY_MOBILE} {
+    width: 300px;
   }
 `;
 
@@ -142,6 +152,10 @@ const Button = styled.button`
 
   &:hover {
     background-color:rgb(35 112 128);
+  }
+
+  ${MEDIA_QUERY_MOBILE} {
+    width: 250px;
   }
 `;
 

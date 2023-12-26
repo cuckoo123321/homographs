@@ -35,7 +35,7 @@ export const fetchProductData = async () => {
 
 export const fetchEventData = async () => {
     try {
-        const response = await fetch(`${baseURL}/eventData/event`, {
+        const response = await fetch(`${baseURL}/eventData/eventData`, {
         method: 'GET',
         mode: 'cors',
         });
@@ -292,6 +292,183 @@ export const deleteCartItem = async (user_id, product_id) => {
     return response.data;
   } catch (error) {
     console.error('刪除購物車商品失敗:', error);
+    throw error;
+  }
+};
+
+//成立訂單
+export const createOrder = async (user_id, order_number, order_products, order_shipping_fee, order_price) => {
+  try {
+    const response = await axios.post(`${baseURL}/orderData/orderAdd`, {
+      user_id,
+      order_number,
+      order_products,
+      order_shipping_fee,
+      order_price,
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('新增訂單失敗:', error);
+    throw error;
+  }
+};
+
+//更新商品庫存
+export const updateProductStock = async (productId, newStock) => {
+  try {
+    //console.log(`Updating stock for product ${productId} to ${newStock}`);
+    
+    const response = await axios.put(`${baseURL}/productData/update_productStock`, {
+      productId: productId,
+      newStock: newStock,
+    });
+
+    return response.data; // 返回伺服器的 JSON 回應，無需再用 .json()
+  } catch (error) {
+    console.error('Error updating product stock:', error);
+    throw error;
+  }
+};
+
+
+//新增收件人資訊
+export const addRecipient = async (user_id, user_name, order_number, recipient_name, recipient_phone, recipient_residence, recipient_address) => {
+  try {
+    const response = await axios.post(`${baseURL}/recipientData/addRecipient`, {
+      user_id,
+      user_name,
+      order_number,
+      recipient_name,
+      recipient_phone,
+      recipient_residence,
+      recipient_address,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('新增收件者資料失敗:', error);
+    throw error;
+  }
+};
+
+//顯示單筆訂單內容
+export const getOrderById = async (order_id) => {
+  try {
+    const response = await fetch(`${baseURL}/orderData/order/${order_id}`, {
+      method: 'GET',
+      mode: 'cors',
+    });
+
+    if (!response.ok) {
+      console.error('Response not ok:', response.statusText);
+      throw new Error('Failed to fetch order');
+    }
+
+    return response.json(); // Assuming the server returns JSON for the order
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    throw error;
+  }
+};
+
+//傳送付款資訊給後端產生綠界要用的 CheckValue
+export const createPayment = async (order_id, orderData) => {
+  try {
+    const response = await axios.post(`${baseURL}/orderData/payment/${order_id}`, orderData);
+    
+    return response.data;
+  } catch (error) {
+    console.error('建立付款失敗:', error);
+    throw error;
+  }
+};
+
+export const GetPaymentData = async (order_id) => {
+  try {
+    const response = await fetch(`${baseURL}/orderData/payment/${order_id}`, {
+      method: 'GET',
+      mode: 'cors',
+    });
+
+    if (!response.ok) {
+      console.error('Response not ok:', response.statusText);
+      throw new Error('Failed to fetch order');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    throw error;
+  }
+};
+
+export const ESPay = async (paymentData) => {
+  try {
+    // 發送 POST 請求到 ECPay API 使用 fetch
+    const response = await fetch('https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: paymentData,
+    });
+
+    // 確認 response 的 ok 屬性，表示請求成功
+    if (!response.ok) {
+      throw new Error(`支付請求失敗: ${response.statusText}`);
+    }
+
+    // 在這裡你可以處理 ECPay 的回應，或者返回給調用者
+    return response.json(); // 假設 ECPay 返回 JSON 資料
+  } catch (error) {
+    console.error('支付時發生錯誤：', error);
+    // 在這裡你可以根據需要處理錯誤，或者返回錯誤信息給調用者
+    throw new Error('支付時發生錯誤');
+  }
+};
+
+// 顯示特定用戶的所有訂單列表
+export const getAllOrdersByUserId = async (user_id) => {
+  try {
+    const response = await fetch(`${baseURL}/orderData/orderList/${user_id}`, {
+      method: 'GET',
+      mode: 'cors',
+    });
+
+    if (!response.ok) {
+      console.error('Response not ok:', response.statusText);
+      throw new Error('Failed to fetch orders');
+    }
+
+    return response.json(); // Assuming the server returns JSON for the orders
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    throw error;
+  }
+};
+
+//向後端發送付款資訊
+export const sendPaymentInfo = async (paymentInfo) => {
+  try {
+    const response = await axios.post(`${baseURL}/orderData/paymentAdd/${paymentInfo.order_id}`, paymentInfo);
+
+    return response.data;
+  } catch (error) {
+    console.error('支付信息發送失敗:', error);
+    throw error;
+  }
+};
+
+//單筆訂單的付款紀錄
+export const getPaymentResult = async (payment_id) => {
+  try {
+    const response = await axios.get(`${baseURL}/orderData/getPaymentResult/${payment_id}`);
+
+    return response.data;
+  } catch (error) {
+    console.error('獲取支付結果失敗:', error);
     throw error;
   }
 };

@@ -4,9 +4,7 @@ import { useEffect, useState } from 'react';
 import { getMe } from '../../WebAPI'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 import UserNav from './UserNav';
-
-
-
+import { MEDIA_QUERY_MOBILE } from '../../constants/style';
 
 const Root = styled.div`
   display: flex;
@@ -15,15 +13,21 @@ const Root = styled.div`
   justify-content: center;
   text-align: center;
   margin-top: 70px;
+  ${MEDIA_QUERY_MOBILE} {
+    margin-bottom: 150px;
+  }
 `;
 
 const UserAreaContainer = styled.div`
   width: 520px;
   height: 100%;
-  padding: 80px 20px;
+  padding: 60px 20px;
   border: 1px solid #ddd; 
   border-radius: 8px; /* 圓角 */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  ${MEDIA_QUERY_MOBILE} {
+    width: 350px;
+  }
 `;
 
 const UserAreaTitle = styled.div`
@@ -125,7 +129,7 @@ export default function UserAreaPage () {
         };
 
         fetchUserData();
-    }, []);
+    }, [navigate]);
 
     const handleUserEdit = () => {
         navigate("/userEdit");

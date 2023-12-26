@@ -8,6 +8,7 @@
     <%- include('../template/navbar') %>
 
     <div class="container mt-5">
+        <% if(admin_name) { %>  
         <div class="row">
             <div class="col-md-3 d-flex">
                 <a class="btn btn-primary mb-2 add" href="/eventAdd">新增活動</a>
@@ -78,7 +79,7 @@
                     <td><%= formattedEventDate %></td>
                     <td><%= event.event_location %></td>
                     <td><%= event.event_organizer %></td>
-                    <td><%= event.event_description %></td>
+                    <td><%= event.event_description.length > 30 ? `${event.event_description.slice(0, 30)}...` : event.event_description %></td>
                     <td>
                         <a href="<%= event.event_website %>" target="_blank"><%- event.event_website %></a>
                     </td>
@@ -95,8 +96,14 @@
             <% }); %>
           </tbody>
     </table>
-
-    </div>
+    <% } else { %>
+        <div class="loginContainer">
+            <p class="loginText">歡迎使用中日同形詞管理系統</p>
+            <p class="loginText">請系統管理員登入系統</p>  
+        </div>
+    <% } %>
+    
+</div>
     <script>
         // alert delete
        function confirmDelete() {

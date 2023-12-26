@@ -6,13 +6,13 @@ import isPropValid from '@emotion/is-prop-valid';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightToBracket, faPenToSquare, faRightFromBracket, faUser,faCartShopping, faRectangleList } from '@fortawesome/free-solid-svg-icons';
-import { faOptinMonster} from '@fortawesome/free-brands-svg-icons';
+//import { faOptinMonster} from '@fortawesome/free-brands-svg-icons';
 import { Link, useLocation } from "react-router-dom";
 import { useContext } from 'react'; ////用於在函式組件中存取上下文
-import { AuthContext } from '../../contexts'; //該上下文是用於存儲和共享身份驗證相關資訊的上下文
+import { AuthContext, CountContext } from '../../contexts'; //該上下文是用於存儲和共享身份驗證相關資訊的上下文
 import { setAuthToken } from '../../constants/utils';//設置 token
 import { useNavigate } from 'react-router-dom';
-import { MEDIA_QUERY_MOBILE, MEDIA_QUERY_TABLET } from '../../constants/style';
+import { MEDIA_QUERY_MOBILE, MEDIA_QUERY_TABLET, MEDIA_QUERY_DESKTOP } from '../../constants/style';
 import ShoppingCartPopover from '../../pages/ShoppingCartPopover/index';
 import { getCart } from '../../WebAPI';
 
@@ -60,12 +60,10 @@ const Brand = styled(Link)`
   text-decoration: none;
   color: rgb(47 150 169);
 
-  ${MEDIA_QUERY_TABLET} {
-    font-size: 20px;
-  }
-  ${MEDIA_QUERY_MOBILE} {
-    font-size: 0px;
-  }
+  ${[MEDIA_QUERY_DESKTOP, MEDIA_QUERY_TABLET, MEDIA_QUERY_MOBILE].map(query => `
+    ${query} {
+      font-size: 0px;
+    }`)}
 `;
 
 const NavbarList = styled.div`
@@ -75,10 +73,9 @@ const NavbarList = styled.div`
   margin-left: 30px;
 
   ${MEDIA_QUERY_MOBILE} {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
     margin-left: 0;
-    margin-top: 10px;
   }
 `;
 
@@ -90,15 +87,13 @@ const NavLeft = styled(Link)`
   font-weight: 500;
 
   ${(props) =>
-    props.$active &&
-    `
+    props.$active &&`
       background: rgba(47, 150, 169, 0.1);
     `}
 
     ${MEDIA_QUERY_MOBILE} {
-      width: 100%;
-      text-align: center;
-      margin-bottom: 5px;
+      font-size: 16px;
+      margin: 0 -20px 0 -20px;
     }
 `;
 
@@ -117,9 +112,20 @@ const NavRight = styled(Link)`
       background: rgba(47, 150, 169, 0.1);
     `}
 
+  ${MEDIA_QUERY_TABLET} {
+    font-size: 16px;
+    &:last-child {
+      margin-right: 50px;
+    }
+  }
+
   ${MEDIA_QUERY_MOBILE} {
     width: 100%;
-    text-align: center;
+    font-size: 0px;
+    margin-right: 20px;
+    &:last-child {
+      margin-right: 100px;
+    }
   }
 `;
 
@@ -137,24 +143,56 @@ const Badge = styled.div`
   position: absolute;
   top: 0px;
   right: 180px;
+  ${MEDIA_QUERY_MOBILE} {
+   display:none;
+  }
 `;
 
 const LeftContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 64px;
+  margin-left: 30px;
 
   ${MEDIA_QUERY_MOBILE} {
     margin-left: 20px;
   }
 `;
 
+const ImageS = styled.img`
+  width: 35px;  
+  height: auto; 
+  margin-right:10px;
+
+  ${MEDIA_QUERY_TABLET} {
+    margin-right: -25px;
+  }
+
+  ${MEDIA_QUERY_MOBILE} {
+    display: none;
+  }
+`;
+
+const Image = styled.img`
+  height: auto; 
+  margin-right:10px;
+
+  ${MEDIA_QUERY_TABLET} {
+    display: none;
+  }
+
+  ${MEDIA_QUERY_MOBILE} {
+    display: none;
+  }
+`;
+
+
 export default function Header() {  
   const location = useLocation();
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [showPopover, setShowPopover] = useState(false);
-  const [cartItemsCount, setCartItemsCount] = useState(0);
+  //const [cartItemsCount, setCartItemsCount] = useState(0);
+  const { cartItemsCount, setCartItemsCount } = useContext(CountContext);
 
   useEffect(() => {
     // 確保 user 已經被正確設定
@@ -182,8 +220,6 @@ export default function Header() {
 
 
   const handleLogout = () => {
-    // 清空購物車的本地存儲數據
-    localStorage.removeItem('cartItems');
     setAuthToken('');
     setUser(null);
     if(location.pathname !== '/'){
@@ -197,7 +233,22 @@ export default function Header() {
     <HeaderContainer>
       <LeftContainer>
         <Brand to="/" $active={location.pathname === '/'}>
-          <FontAwesomeIcon icon={faOptinMonster} style={{color: "#2f96a9", marginRight:"10px"}} />
+          {/* <FontAwesomeIcon icon={faOptinMonster} style={{color: "#2f96a9", marginRight:"10px"}} /> */}
+          <ImageS 
+         src={process.env.PUBLIC_URL + '/imgs/monster_S-3.png'}  
+         alt="小怪獸S-3"
+         />
+         <Image 
+         src={process.env.PUBLIC_URL + '/imgs/monster_D-1.png'}  
+         alt="小怪獸D-1"
+         style={{width:"28px"}}
+         />
+          <Image 
+         src={process.env.PUBLIC_URL + '/imgs/monster_O-2.png'}  
+         alt="小怪獸O-2"
+         style={{width:"40px"}}
+         />
+         
           實用中日同形詞攻略法</Brand>
         <NavbarList>
           <NavLeft to="/product" $active={location.pathname === '/product'}>商品總覽</NavLeft>
@@ -205,7 +256,8 @@ export default function Header() {
           <NavLeft to="/about" $active={location.pathname === '/about'}>關於我們</NavLeft>
         </NavbarList>
       </LeftContainer>
-      <NavbarList>
+
+        <NavbarList>
         {!user && <NavRight to="/register" $active={location.pathname === '/register'}>
             <div><FontAwesomeIcon icon={faPenToSquare} style={{color: "#2f96a9", fontSize: "24px"}} /></div>
             <div>註冊</div>
@@ -216,7 +268,7 @@ export default function Header() {
             <div>登入</div>          
           </NavRight> }
 
-          {user && <NavRight>
+          {user && <NavRight to={`/orderList/${user.user_id}`} $active={location.pathname === `/orderList/${user.user_id}`}>
             <div><FontAwesomeIcon icon={faRectangleList} style={{color: "#2f96a9", fontSize: "24px"}} /></div>
             <div>訂單</div>
           </NavRight> }        
@@ -244,8 +296,8 @@ export default function Header() {
 
           {user && <NavRight className="margin: 0px" to="/login" onClick={handleLogout}><FontAwesomeIcon icon={faRightFromBracket} style={{ color: "#2f96a9", fontSize: "24px"}}/><div>登出</div></NavRight>}
 
-
         </NavbarList>
+      
     </HeaderContainer>
    </StyleSheetManager>
   )

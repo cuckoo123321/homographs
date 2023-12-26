@@ -17,8 +17,8 @@
 </head>
 <body>
     <%- include('../template/navbar') %>
-
     <div class="container mt-5">
+    <% if(admin_name) { %>   
         <div class="row">
             <div class="col-md-3 d-flex">
                 <a class="btn btn-primary mb-2 add" href="/productAdd">新增商品</a>
@@ -118,11 +118,17 @@
         <ul class="pagination">
           <% for(let i = 1; i <= totalPages; i++) { %>
             <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                <a class="page-link" href="/product/productList?page=<%= i %>"><%= i %></a>
+                <a class="page-link" href="/productList/page=<%= i %>"><%= i %></a>
             </li>
           <% } %>
         </ul>
       </div>
+      <% } else { %>
+        <div class="loginContainer">
+            <p class="loginText">歡迎使用中日同形詞管理系統</p>
+            <p class="loginText">請系統管理員登入系統</p>  
+        </div>
+      <% } %>  
     </div>
 
     <script>

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { MEDIA_QUERY_MOBILE } from '../../constants/style';
 
 const Root = styled.div`
   display: flex;
@@ -14,6 +15,9 @@ const Root = styled.div`
   justify-content: center;
   text-align: center;
   margin-top: 70px;
+  ${MEDIA_QUERY_MOBILE} {
+    margin-top: 0px;
+  }
 `;
 
 const LoginContainer = styled.div`
@@ -24,6 +28,11 @@ const LoginContainer = styled.div`
   border: 1px solid #ddd; 
   border-radius: 8px; /* 圓角 */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  ${MEDIA_QUERY_MOBILE} {
+    margin-top: 30px;
+    border: none;
+    box-shadow: none;
+  }
 `;
 
 const LoginTitle = styled.div`
@@ -149,6 +158,11 @@ export default function LoginPage() {
     e.preventDefault();
     setPasswordVisible(!passwordVisible);
   };
+
+  const handleResetPassword = () => {
+    alert('「忘記密碼」功能開發中，請再等等！( ´･･)ﾉ(._.`)');
+  };
+
   return (
     <Root>
       <LoginContainer>
@@ -166,7 +180,7 @@ export default function LoginPage() {
           </FormGroup>
           <Button type="button" onClick={handleSubmit} style={{ margin: "20px 0px" }}>登入</Button>
           <ButtonContainer>
-            <Button type="button">忘記密碼？</Button>
+            <Button type="button" onClick={handleResetPassword}>忘記密碼？</Button>
             <Button type="button" onClick={handleRegister}>註冊會員</Button>
           </ButtonContainer>
         </Form>

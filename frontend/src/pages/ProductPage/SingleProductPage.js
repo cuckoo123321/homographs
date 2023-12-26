@@ -7,13 +7,14 @@ import { faHeart, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { getProductById, addToFavorites, addToCart } from '../../WebAPI';
 import { useContext } from 'react'; //用於在函式組件中存取上下文
 import { AuthContext } from '../../contexts'; //存儲和共享身份驗證相關資訊的上下文
+import { MEDIA_QUERY_MOBILE } from '../../constants/style';
 
 
 const Root = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 150px;
+  margin-top: 80px;
 `;
 
 const Container = styled.div`
@@ -21,6 +22,13 @@ const Container = styled.div`
   border-radius: 8px;  
   display: flex;
   max-width: 1000px; /* 設定最大寬度，以防止內容過寬 */
+  margin-bottom: 200px;
+  ${MEDIA_QUERY_MOBILE} {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 const ProductImgContainer = styled.div`
@@ -29,6 +37,11 @@ const ProductImgContainer = styled.div`
   border-radius: 8px;
   border: 0.5px solid rgb(47, 150, 169,0.2);
   box-shadow: 0px 5px 5px rgb(47, 150, 169, 0.5);
+  ${MEDIA_QUERY_MOBILE} {
+    width: 300px;
+    border:none; 
+    box-shadow: none;
+  }
 `;
 
 const ProductImg = styled.img`
@@ -41,6 +54,9 @@ const ProductImg = styled.img`
 const ProductDetails = styled.div`
   flex: 1; /* 佔據剩餘空間 */
   margin-left: 50px;
+  ${MEDIA_QUERY_MOBILE} {
+    margin: 30px 0 0 0;
+  }
 `;
 
 const ProductTitle = styled.h2`
@@ -91,6 +107,9 @@ const ProductDescription = styled.div`
     color: rgb(60 60 60);
     font-size: 18px;
     margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     flex-grow: 1; /* 使 ProductDescription 佔據剩餘空間 */
 `;
 
@@ -124,7 +143,7 @@ const Button = styled.button`
   border-radius: 5px;
   padding: 10px;
   margin-right: 10px;
-  margin-top:30px;
+  margin-top:20px;
   cursor: pointer;
   flex: 1; /* 讓按鈕佔據彈性空間的一半 */
 
@@ -134,10 +153,16 @@ const Button = styled.button`
   &:hover {
     background: rgb(35 112 128);
   }
+  ${MEDIA_QUERY_MOBILE} {
+    margin-top:0px;
+  }
 `;
 
 const ButtonLabel = styled.span`
   font-size: 16px;
+  ${MEDIA_QUERY_MOBILE} {
+    font-size: 0px;
+  }
 `;
 
 const QuantitySelector = styled.div`
@@ -209,13 +234,12 @@ export default function SingleProductPage ({ setCartItems }){
   const handleFavorite = async (product_id) => {
     try {
       if (!user || !user.user_id) {
-        console.error('無法獲取使用者資訊');
+        alert('請先登入會員');
+        navigate("/login");
         return;
       }
 
       // 使用 Web API 將商品加入收藏清單
-      //const result = await addToFavorites({ user_id: user.user_id, product_id });
-      //console.log('成功加入收藏清單:', result);
       await addToFavorites({ user_id: user.user_id, product_id });
       alert('成功加入收藏清單');
       
@@ -322,21 +346,21 @@ export default function SingleProductPage ({ setCartItems }){
             </ItemGroup>
             <ItemGroup>
                 <Label>提醒：</Label>
-                <ProductDescription>本平台僅支援信用卡付款，並提供配送至您指定的地址。若您相同此交易方式再進行購買，我們將提供快捷的信用卡結帳和郵寄服務，感謝您的惠顧。</ProductDescription>
+                <ProductDescription>本平台僅支援線上付款，並提供配送至您指定的地址。滿千免運，未滿千國內一律酌收100元運費。若您相同此交易方式再進行購買，我們將提供快捷的結帳和郵寄服務，感謝您的惠顧。</ProductDescription>
 
             </ItemGroup>
             
           <ButtonGroup>
-            <Button>
+            <Button onClick={() => handleAddToCart(
+                    product.product_id, quantity)}  >
                 <FontAwesomeIcon icon={faShoppingCart} style={{ color: 'white', fontSize: '24px' }} />
-                <ButtonLabel onClick={() => handleAddToCart(
-                    product.product_id, quantity)}                    
+                <ButtonLabel                   
                     >加入購物車
                 </ButtonLabel>                   
             </Button>
-            <Button>
+            <Button onClick={() => handleFavorite(product.product_id)}>
                 <FontAwesomeIcon icon={faHeart} style={{ color: 'white', fontSize: '24px' }} />
-                <ButtonLabel onClick={() => handleFavorite(product.product_id)}>收藏商品</ButtonLabel>    
+                <ButtonLabel >收藏商品</ButtonLabel>    
             </Button>
           </ButtonGroup>
         </ProductDetails>

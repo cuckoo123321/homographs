@@ -30,15 +30,18 @@ const eventModel = {
     //     )
     // },
 
-  getAll: (cb) =>{
-    db.query(
-      `SELECT * FROM events`,
-      (err, results) => {
-        if(err) return cb (err);
-        cb(null, results);
-      }
-    );
-  },
+    getAll: (cb) =>{
+        db.query(
+        `SELECT * FROM events`,
+        (err, results) => {
+            if(err) return cb (err);
+            cb(null, results);
+        }
+        );
+    },
+
+
+
     getCount:(cb)=>{
         db.query(`SELECT COUNT(*) AS count FROM events`,(err, results)=>{
             if(err) return cb(err);

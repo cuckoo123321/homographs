@@ -8,9 +8,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import {  useLocation } from "react-router-dom";
 import { updateUserData } from '../../WebAPI';
 import UserNav from './UserNav';
-
-
-
+import { MEDIA_QUERY_MOBILE } from '../../constants/style';
 
 const Root = styled.div`
   display: flex;
@@ -19,15 +17,20 @@ const Root = styled.div`
   justify-content: center;
   text-align: center;
   margin-top: 70px;
+
 `;
 
 const UserAreaContainer = styled.div`
   width: 520px;
   height: 100%;
-  padding: 80px 20px;
+  padding: 40px 20px;
+  margin-bottom: 200px;
   border: 1px solid #ddd; 
   border-radius: 8px; /* 圓角 */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  ${MEDIA_QUERY_MOBILE} {
+    width: 350px;
+  }
 `;
 
 const UserAreaTitle = styled.div`
@@ -187,7 +190,7 @@ export default function UserEdit () {
         };
 
         fetchUserData();
-    }, []);
+    }, [navigate]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;    

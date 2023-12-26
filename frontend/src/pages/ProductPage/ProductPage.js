@@ -8,14 +8,13 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { Link } from "react-router-dom";
 
 
-
 const Root = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   margin-top: 70px;
-  margin-bottom: 300px;
+  margin-bottom: 500px;
 `;
 
 const FilterContainer = styled.div`
@@ -57,6 +56,10 @@ const Label = styled.label`
   font-size: large;
   font-weight: bold;
 
+  ${MEDIA_QUERY_MOBILE} {
+    font-size: 0;
+  }
+
 `;
 
 const Select = styled.select`
@@ -72,6 +75,10 @@ const ProductContainer = styled.div`
   width: 1375px;
   padding: 180px 0;
   height: 100vh; /* 設定整個區域的高度為視窗高度 */
+
+  ${MEDIA_QUERY_MOBILE} {
+    padding: 20px 20px;
+  }
 
   ${MEDIA_QUERY_TABLET} {
     padding: 60px 20px;
@@ -90,6 +97,7 @@ const ProductTitle = styled.div`
     color: rgb(47, 150, 169);
     letter-spacing: 0.04em;
     margin-bottom: 40px;
+  }
 `;
 
 const ProductCard = styled.div`
@@ -103,15 +111,15 @@ const ProductCard = styled.div`
  
 
   ${MEDIA_QUERY_MOBILE} {
-    margin: 20px 5px;
+    margin: 250px 5px 0 5px;
   }
 
   ${MEDIA_QUERY_TABLET} {
-    margin: 40px 10px;
+    margin: 150px 10px 0 10px;
   }
 
   ${MEDIA_QUERY_DESKTOP} {
-    margin: 60px 20px;
+    margin: 150px 20px 0 20px;
   }
 `;
 
@@ -192,13 +200,19 @@ const PageButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin-bottom: 200px;
 
   &:hover {
     background: rgb(35 112 128);
   }
 `;
+
+const PageCount = styled.span`
+margin-bottom: 200px;
+`;
 const FirstLastPageButton = styled(PageButton)`
   margin: 0 5px;
+  margin-bottom: 200px;
 `;
 
 const PAGE_SIZE = 10; // 每頁顯示的商品數量
@@ -380,7 +394,7 @@ export default function ProductPage() {
       <Pagination>
       <FirstLastPageButton onClick={() => setCurrentPage(1)}>第一頁</FirstLastPageButton>
         <PageButton onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>◀︎</PageButton>
-        <span>{currentPage} / {totalPages}</span>
+        <PageCount>{currentPage} / {totalPages}</PageCount>
         <PageButton onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}>▶︎</PageButton>
         <FirstLastPageButton onClick={() => setCurrentPage(totalPages)}>最末頁</FirstLastPageButton>
       </Pagination>

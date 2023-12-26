@@ -6,6 +6,7 @@ import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { getCart, updateCartQuantity, deleteCartItem } from '../../WebAPI';
 import { AuthContext } from '../../contexts'; //存儲和共享身份驗證相關資訊的上下文
+import { MEDIA_QUERY_MOBILE } from '../../constants/style';
 
 const Overlay = styled.div`
   position: fixed;
@@ -17,8 +18,28 @@ const Overlay = styled.div`
   z-index: 1000; 
 `;
 
+const CloseMark = styled.div`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  font-size: 28px;
+  color: rgb(173 62 74); 
+  text-align: center;
+  z-index: 1001; 
+
+  &:hover{
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+`;
+
 const PopoverContainer = styled.div`
-  width: 750px;
+  width: 780px;
+  max-height: 100%; /* 設定最大高度 */
+  overflow-y: auto; /* 超過高度時顯示垂直卷軸 */
   position: fixed;
   top: 50%;
   left: 50%;
@@ -28,6 +49,10 @@ const PopoverContainer = styled.div`
   border-radius: 8px;
   cursor: auto;
   z-index: 1001; /*蓋在overlay之上*/
+
+  ${MEDIA_QUERY_MOBILE} {
+    width: 300px;
+  }
 `;
 
 const Title = styled.div`
@@ -41,6 +66,19 @@ const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
+  ${MEDIA_QUERY_MOBILE} {
+    font-size: 12px;
+  }
+`;
+
+const TableHead = styled.tr`
+  border-bottom: 1px solid #ddd;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  ${MEDIA_QUERY_MOBILE} {
+    font-size: 14px;
+  }
 `;
 
 const TableRow = styled.tr`
@@ -65,6 +103,9 @@ const QuantityButton = styled.button`
     text-align: center;
     cursor: pointer;
     font-size: 18px;
+    ${MEDIA_QUERY_MOBILE} {
+      display: none;
+    }
 `;
 
 const QuantityInput = styled.input`
@@ -73,6 +114,9 @@ const QuantityInput = styled.input`
   border: 1px solid rgba(47, 150, 169);
   border-radius: 3px;
   margin: 0 8px;
+  ${MEDIA_QUERY_MOBILE} {
+    width: 30px;
+  }
 `;
 
 const RemoveButton = styled.button`
@@ -83,10 +127,15 @@ const RemoveButton = styled.button`
 `;
 
 const PriceButtonContainer = styled.div`
-  width: 690px;
+  width: 720px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  ${MEDIA_QUERY_MOBILE} {
+    width: 250px;
+    flex-direction: column;
+    justify-content: start;
+  }
 `;
 
 const TotalPrice = styled.div`
@@ -96,7 +145,7 @@ const TotalPrice = styled.div`
 
 const Alert = styled.div`
   text-align: center;
-  margin-top: -25px;
+  margin-top: 30px;
 `;
 
 const CheckoutButton = styled.button`
@@ -112,6 +161,13 @@ const CheckoutButton = styled.button`
   letter-spacing: 1rem;
   &:hover{
     background: rgb(35 112 128);
+  }
+  ${MEDIA_QUERY_MOBILE} {
+    width: 100px;
+    height:30px;
+    font-size: 20px;
+    text-align: center;
+    padding: 0 0 0 8px;;
   }
 `;
 
@@ -232,12 +288,22 @@ export default function ShoppingCartPopover () {
       }
     };
   
-    const handleCheckoutClick = () => {
-      navigate('/checkOut');
+    const handleCheckoutClick = (e) => {
+
+      // 提示警告
+    const isConfirmed = window.confirm('確定結帳？請關閉購物車，進入結帳頁面');
+      // 如果用戶確定，導向結帳頁面
+      if (isConfirmed) {
+        navigate("/checkOut");
+      } else {
+        // 如果用戶取消，防止事件冒泡
+        e.stopPropagation();
+      }
     };
     
     return (
       <Overlay>
+        <CloseMark>✕</CloseMark>
         <div onClick={stopPropagation}>
           <PopoverContainer>
             <Title>購物車清單</Title>
@@ -248,13 +314,13 @@ export default function ShoppingCartPopover () {
                 <>
                 <Table>
                   <thead>
-                    <TableRow style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center" }}>
+                    <TableHead>
                       <TableCell>商品</TableCell>
                       <TableCell>數量</TableCell>
                       <TableCell>單價</TableCell>
                       <TableCell>小計</TableCell>
                       <TableCell>移除</TableCell>
-                    </TableRow>
+                    </TableHead>
                   </thead>
                   <tbody>
                     {cartItems.map((product) => (

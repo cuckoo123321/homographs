@@ -7,6 +7,7 @@ import { fetchProductData, getFavoriteList, removeFromFavorites, addToCart } fro
 import { Link } from 'react-router-dom';
 import { useContext } from 'react'; //用於在函式組件中存取上下文
 import { AuthContext } from '../../contexts'; //存儲和共享身份驗證相關資訊的上下文
+import { MEDIA_QUERY_MOBILE} from '../../constants/style';
 
 const Root = styled.div`
   display: flex;
@@ -20,10 +21,14 @@ const Root = styled.div`
 const UserFavoriteContainer = styled.div`
   width: 700px;
   height: 100%;
-  padding: 80px 20px;
+  padding: 60px 20px;
+  margin-bottom: 200px;
   border: 1px solid #ddd; 
   border-radius: 8px; /* 圓角 */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  ${MEDIA_QUERY_MOBILE} {
+    width: 350px;
+  }
 `;
 
 const UserFavoriteTitle = styled.h1`
@@ -43,6 +48,11 @@ const Alert = styled.div`
 const InfoContainer = styled.div`
     display: flex;
     flex-direction: row;
+    ${MEDIA_QUERY_MOBILE} {
+      flex-direction: column;
+      align-items: flex-start;
+      margin: 10px 0;
+    }
 `;
 
 const Index = styled.div`
@@ -75,6 +85,10 @@ const FavoriteItem = styled.div`
   border-radius: 4px;
   &:hover{
     background: rgb(47, 150, 169, 0.1);
+  }
+  ${MEDIA_QUERY_MOBILE} {
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 
@@ -186,7 +200,7 @@ export default function UserFavoritePage () {
            
             <UserFavoriteContainer>
                 <UserFavoriteTitle>收藏商品清單</UserFavoriteTitle>
-                {favorites.length === 0 ? (
+                  {favorites.length === 0 ? (
                     <Alert>您尚未收藏任何商品</Alert>
                 ) : (
                     favorites.map((favorite, index) => {
@@ -213,7 +227,7 @@ export default function UserFavoritePage () {
                           </FavoriteItem>
                         );
                       })
-                )}
+                )}               
             </UserFavoriteContainer>
       </Root>
     );

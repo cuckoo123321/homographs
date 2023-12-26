@@ -5,23 +5,33 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { MEDIA_QUERY_MOBILE } from '../../constants/style';
 
 const Root = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-top: 70px;
+  margin-top: 50px;
+  ${MEDIA_QUERY_MOBILE} {
+    margin-top: 0px;
+    margin-bottom: 60px;
+  }
 `;
 
 const RegisterContainer = styled.div`
   width: 520px;
-  height: 100%;
-  padding: 80px 20px;
+  height: 600px;
+  padding: 50px 20px;
   margin-top: 100px;
   border: 1px solid #ddd; 
   border-radius: 8px; /* 圓角 */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  ${MEDIA_QUERY_MOBILE} {
+    margin-top: 30px;
+    border: none;
+    box-shadow: none;
+  }
 `;
 
 const RegisterTitle = styled.div`
@@ -288,7 +298,7 @@ export default function RegistrationPage() {
               name="user_gender" 
               value={user_gender}              
               onChange={(e) => setGender(e.target.value)}>
-              <option disabled selected>
+              <option value="" disabled selected>
                 請選擇性別
               </option>
               <option value="male">男性</option>

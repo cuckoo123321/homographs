@@ -9,6 +9,7 @@
 
     <div class="container mt-5">
         <div class="row">
+            <% if(admin_name) { %>  
             <div class="col-md-3 d-flex">
                 <a class="btn btn-primary mb-2 add" href="/add">新增管理員</a>
                 <a class="btn btn-primary mb-2" href="/list">顯示所有列表</a>
@@ -138,6 +139,12 @@
           <% } %>
         </ul>
       </div>
+      <% } else { %>
+        <div class="loginContainer">
+            <p class="loginText">歡迎使用中日同形詞管理系統</p>
+            <p class="loginText">請系統管理員登入系統</p>  
+        </div>
+      <% } %> 
     </div>
     <script>
         // alert delete

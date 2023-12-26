@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+    <%- include('../../css/listStyle') %>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    
+    <div class="container mt-5">
+        <% if(admin_name) { %>
+
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>訂單編號</th>
+                    <th>用戶編號</th>
+                    <th>訂單內容</th>
+                    <th>交易金額</th>
+                    <th>下單時間</th>
+                    <th>付款狀態</th>
+                    <th>付款時間</th>
+                    <th>交易結果</th>
+                    <th>出貨狀態</th>
+                    <th>收件人</th>
+                    <th>電話</th>
+                    <th>地址</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% orders.forEach(function(order) { %>
+                    <tr>
+                        <td><%= order.order_number %></td>
+                        <td><%= order.user_id %></td>
+                        <!-- 訂單內容 -->
+                        <td><%= order.order_products %></td>
+                        <td><%= order.order_price %>元</td>
+                        <!-- 下單時間 -->
+                        <% let dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }; %>
+                        <% let orderDate = order.order_date; %>
+                         <% let formattedOrderDate = orderDate.toLocaleString('zh-TW', dateOptions); %>
+                        <td><%= formattedOrderDate %></td>
+                        <!-- 付款狀態 -->
+                        <td><%= order.payment.is_paid ? '已付款' : '未付款' %></td>
+                        <!-- 付款時間 -->
+                        <% let paymentDate = order.payment.payment_created_at; %>
+                        <% let formattedPaymentDate = paymentDate ? paymentDate.toLocaleString('zh-TW', dateOptions) : ''; %>
+                        <td><%= formattedPaymentDate %></td>
+                        <!-- 交易結果 -->
+                        <% const successStyle = order.payment.is_success ? 'color: green;' : 'color: red;'; %>
+                        <td style="<%= successStyle %>"><%= order.payment.is_success ? '交易成功' : '交易失敗' %></td>
+                        <!-- 出貨狀態 -->
+                        <td>
+                            <form action="/update_order_delivered/<%= order.order_id %>" method="post">
+                                <select name="is_delivered" onchange="this.form.submit()" style="color: <%= order.payment.is_delivered === '未出貨' ? 'red' : (order.payment.is_delivered === '已出貨' ? 'blue' : 'green') %>;">
+                                    <option value="未出貨" <%= order.payment.is_delivered === '未出貨' ? 'selected' : '' %>>未出貨</option>
+                                    <option value="已出貨" <%= order.payment.is_delivered === '已出貨' ? 'selected' : '' %>>已出貨</option>
+                                    <option value="已送達" <%= order.payment.is_delivered === '已送達' ? 'selected' : '' %>>已送達</option>
+                                </select>
+                            </form>
+                        </td>
+                        
+                        <!-- 收件人相關資訊 -->
+                        <td><%= order.recipient.recipient_name %></td>
+                        <td><%= order.recipient.recipient_phone %></td>
+                        <%
+                        const residenceMapping = {
+                        Taipei: '台北市',
+                        'New Taipei': '新北市',
+                        Keelung: '基隆市',
+                        Yilan: '宜蘭縣',
+                        Hsinchu: '新竹市',
+                        Miaoli: '苗栗縣',
+                        Taoyuan: '桃園市',
+                        Taichung: '台中市',
+                        Changhua: '彰化縣',
+                        Nantou: '南投縣',
+                        Yunlin: '雲林縣',
+                        Chiayi: '嘉義市',
+                        Tainan: '台南市',
+                        Kaohsiung: '高雄市',
+                        Pingtung: '屏東縣',
+                        Taitung: '台東縣',
+                        Hualien: '花蓮縣',
+                        Penghu: '澎湖縣',
+                        Kinmen: '金門縣',
+                        Lienchiang: '連江縣',
+                        Other: '其他',
+                        };
+
+                        const recipientResidence = order.recipient.recipient_residence;
+                        const formattedResidence = residenceMapping[recipientResidence] || recipientResidence;
+                        %>
+                        <td><%= formattedResidence %> <%= order.recipient.recipient_address %></td>
+                        <td>
+                            <a class="btn btn-outline-danger" href="/delete_order/<%= order.order_number %>" onclick="return confirmDelete();">刪除</a>
+                        </td>   
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <% } else { %>
+            <div class="loginContainer">
+                <p class="loginText">歡迎使用中日同形詞管理系統</p>
+                <p class="loginText">請系統管理員登入系統</p>  
+            </div>
+        <% } %> 
+    </div>
+    <script>
+        // alert delete
+       function confirmDelete() {
+            return confirm('確定要刪除此筆訂單嗎？');
+        }
+    </script>
+</body>
+</html>

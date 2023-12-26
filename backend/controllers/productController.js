@@ -1,5 +1,5 @@
 const productModel = require('../models/productModel');
-const itemsPerPage = 10;
+const itemsPerPage = 30;
 const multer = require('multer'); // 用於處理上傳的中間件
 const path = require('path');
 const fs = require('fs');
@@ -254,8 +254,6 @@ const productController = {
         try {
           // 使用 productModel.updateProductStock 更新庫存
           const result = await productModel.updateProductStock(productId, newStock);
-    
-          console.log('Update product stock result:', result);
     
           res.json(result);
         } catch (error) {

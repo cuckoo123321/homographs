@@ -1,10 +1,13 @@
+require('dotenv').config();
 let mysql = require('mysql');
-let connection = mysql.createConnection({
-    host: '127.0.0.1',
-    port: 3306,
-    user     : 'cuckoo',
-    password : 'Recount-Dodgy-Composer2',
-    database : 'homographs'
+const { HOST, PORT, DATABASE_USER,  PASSWORD, DATABASE } = process.env;
+
+let connection = mysql.createConnection({    
+    host: HOST,
+    port: PORT,
+    user     : DATABASE_USER,
+    password : PASSWORD,
+    database : DATABASE
 });
 
 

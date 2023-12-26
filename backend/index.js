@@ -10,18 +10,19 @@ const userController = require('./controllers/userController');
 const eventController = require('./controllers/eventController');
 const carouselController = require('./controllers/carouselController');
 const productController = require('./controllers/productController');
-const productReviewController = require('./controllers/productReviewController');
+//const productReviewController = require('./controllers/productReviewController');
 const favoriteController = require('./controllers/favoriteController');
 const cartController = require('./controllers/cartController');
 const recipientController = require('./controllers/recipientController');
 const orderController = require('./controllers/orderController');
+
 const path = require('path');
 const apiRoutes = require('./routes/apiRoutes'); //API路由
 const cors = require('cors'); //同源政策
 require('dotenv').config();
 const ECPayMiddleware = require('./middleware/ECPay');
 
-const EventController = require('./controllers/2eventController');
+
 
 //設置視圖引擎
 app.set('view engine', 'ejs');
@@ -63,6 +64,11 @@ app.get('/',(req, res) => {
   res.render('index',{ admin_full_name });// 傳遞變數到模板
 });
 
+//order後台
+app.get('/orderList',orderController.handleGetAllOrders);
+app.get('/delete_order/:number', orderController.delete);
+app.post('/update_order_delivered/:id', orderController.updateIsDelivered);
+
 //admin
 app.get('/login', adminController.login);
 app.post('/login', adminController.handleLogin, redirectBack);
@@ -88,6 +94,28 @@ app.get('/user', userController.getUserInfo);
 app.post('/userRegister', userController.userRegister);
 app.put('/userUpdate/:id', userController.FrontendHandleUpdate);
 
+//event
+app.get('/eventAdd', eventController.add);
+app.post('/eventAdd', eventController.handleAdd, redirectBack);
+app.get('/eventList', eventController.getAll);
+app.get('/update_event/:id', eventController.update);
+app.post('/update_event/:id', eventController.handleUpdate);
+app.get('/delete_event/:id', eventController.delete);
+//event 前端用API
+app.get('/eventData', eventController.getEventData);
+
+//carousel
+app.get('/carouselAdd', carouselController.add);
+app.post('/carouselAdd', carouselController.handleAdd, redirectBack);
+app.get('/carouselList', carouselController.getAll);
+app.get('/update_carousel/:id', carouselController.update);
+app.post('/update_carousel/:id', carouselController.handleUpdate);
+app.get('/delete_carousel/:id', carouselController.delete);
+//carousel前端API
+app.get('/carousel', carouselController.getCarouselData);
+
+
+
 //product
 app.get('/productAdd', productController.add);
 app.post('/productAdd', productController.handleAdd, redirectBack);
@@ -100,22 +128,8 @@ app.get('/:id', productController.getProductById);
 app.put('/update_productStock', productController.updateProductStock)
 
 //productReview
-app.get('/productReviewList', productReviewController.getAll);
+//app.get('/productReviewList', productReviewController.getAll);
 //app.get('/delete_productReview/:id', productReviewController.delete);
-
-//event
-app.get('/eventList', eventController.getAll);
-app.get('/EventList', EventController.getAll);
-//event 前端用API
-app.get('/eventData', eventController.getEventData);
-
-//carousel
-app.get('/carouselAdd', carouselController.add);
-app.post('/carouselAdd', carouselController.handleAdd, redirectBack);
-app.get('/carouselList', carouselController.getAll);
-app.get('/update_carousel/:id', carouselController.update);
-app.post('/update_carousel/:id', carouselController.handleUpdate);
-app.get('/delete_carousel/:id', carouselController.delete);
 
 //favorite
 app.post('/favoriteAdd', favoriteController.addToFavorites);
@@ -131,14 +145,21 @@ app.delete('/deleteCartItem/:user_id/:product_id', cartController.deleteCartItem
 //recipient
 app.post('/addRecitient', recipientController.addRecipient);
 
-//order
+//order前端用API
 app.post('/orderAdd', orderController.createOrder);
 app.get('/order/:order_id', orderController.getOrderById);
-app.post('/payment/:order_id', orderController.GetCheckValue);
-app.get('/result', orderController.GetCheckValue);
-app.post('/result', orderController.result);
-app.post('/return', orderController.paymentReturn);
-app.get('/clientReturn', orderController.clientReturn);
+app.post('/paymentAdd/:order_id', orderController.createPayment);
+app.get('/getPaymentResult/:payment_id', orderController.getPaymentResult);
+app.get('/orderList/:user_id', orderController.getAllOrdersByUserId);
+
+
+//app.post('/return', orderController.paymentReturn);
+//app.get('/clientReturn', orderController.clientReturn);
+//app.post('/payment/:order_id', orderController.GetCheckValue);
+
+//app.get('/result', orderController.result);
+//app.post('/result', orderController.GetCheckValue);
+
 
 //啟動伺服器
 app.listen(port, () => {

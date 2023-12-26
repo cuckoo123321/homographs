@@ -234,6 +234,17 @@ const carouselController = {
           });
         });
     },
+
+    //前端API
+    getCarouselData:async (req, res) => {
+        try {
+          const carouselData = await carouselModel.getCarouselData();
+          res.json(carouselData);
+        } catch (error) {
+          console.error('Error fetching carousel data:', error);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
+    },
     
       
 }
