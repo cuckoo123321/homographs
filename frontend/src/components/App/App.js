@@ -51,7 +51,7 @@ function App() {
       }else {
         // 無 Token，表示用戶已登出或 token 失效        
         // 驗證時間超時，顯示提示彈窗
-        window.alert('驗證已逾時，請重新登入');
+        //window.alert('驗證已逾時，請重新登入');
       }
     };
   
