@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/homographs/static/css/main.f96f07a4.css",
-    "main.js": "/homographs/static/js/main.092cc035.js",
+    "main.js": "/homographs/static/js/main.a63db54f.js",
     "index.html": "/homographs/index.html",
     "main.f96f07a4.css.map": "/homographs/static/css/main.f96f07a4.css.map",
-    "main.092cc035.js.map": "/homographs/static/js/main.092cc035.js.map"
+    "main.a63db54f.js.map": "/homographs/static/js/main.a63db54f.js.map"
   },
   "entrypoints": [
     "static/css/main.f96f07a4.css",
-    "static/js/main.092cc035.js"
+    "static/js/main.a63db54f.js"
   ]
 }
