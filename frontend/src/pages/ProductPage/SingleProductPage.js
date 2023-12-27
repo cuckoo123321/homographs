@@ -198,6 +198,7 @@ export default function SingleProductPage ({ setCartItems }){
   const [quantity, setQuantity] = useState(1);
   const [ cartItemsCount, setCartItemsCount] = useState(0);
   const navigate = useNavigate();
+  const HOST = 'https://homographs-backend-497c2e6eca4b.herokuapp.com';
 
   useEffect(() => {
     // 根據 productId 從 API 中取得商品詳細資訊
@@ -305,7 +306,7 @@ export default function SingleProductPage ({ setCartItems }){
         {product ? (
             <>
         <ProductImgContainer>
-            <ProductImg src={`http://localhost:5001/uploads/${product.product_path}`} alt={`Product ${product.product_id}`} />
+            <ProductImg src={`${HOST}/uploads/${product.product_path}`} alt={`Product ${product.product_id}`} />
         </ProductImgContainer>
         <ProductDetails>
           <ProductTitle>{product.product_title}</ProductTitle>

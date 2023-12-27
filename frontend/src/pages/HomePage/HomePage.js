@@ -151,6 +151,7 @@ export default function HomePage() {
   const [carouselData, setCarouselData] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
+  const HOST = 'https://homographs-backend-497c2e6eca4b.herokuapp.com';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -190,7 +191,7 @@ export default function HomePage() {
         <CarouselContainer>
         {carouselData.map((carousel, index) => (
             <CarouselItem key={carousel.carousel_id} style={{ opacity: index === currentIndex ? 1 : 0 }}>
-              <CarouselImg src={`http://localhost:5001/uploads/${carousel.carousel_path}`} alt={`Carousel ${carousel.carousel_id}`}/>
+              <CarouselImg src={`${HOST}/uploads/${carousel.carousel_path}`} alt={`Carousel ${carousel.carousel_id}`}/>
             </CarouselItem>
           ))}
           <div className="carousel__page">

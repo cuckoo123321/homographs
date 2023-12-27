@@ -12,7 +12,7 @@ const Root = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-top: 50px;
+  margin-top: 30px;
   ${MEDIA_QUERY_MOBILE} {
     margin-top: 0px;
     margin-bottom: 60px;
@@ -21,7 +21,7 @@ const Root = styled.div`
 
 const RegisterContainer = styled.div`
   width: 520px;
-  height: 600px;
+  height: 620px;
   padding: 50px 20px;
   margin-top: 100px;
   border: 1px solid #ddd; 

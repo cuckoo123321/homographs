@@ -226,6 +226,7 @@ export default function ProductPage() {
     const [categoryFilter, setCategoryFilter] = useState(null);    
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const HOST = 'https://homographs-backend-497c2e6eca4b.herokuapp.com';
 
     
 
@@ -382,7 +383,7 @@ export default function ProductPage() {
             <Link to={`/product/${product.product_id}`} key={product.product_id} style={{textDecoration: "none"}}>
               {/* 點擊時導向到 SingleProductPage */}
               <div>
-                <ProductImg src={`http://localhost:5001/uploads/${product.product_path}`} alt={`Product ${product.product_id}`} />
+                <ProductImg src={`${HOST}/uploads/${product.product_path}`} alt={`Product ${product.product_id}`} />
               </div>
               <ProductText style={{color:"rgb(31 100 113)"}}>{product.product_title}</ProductText>
               <Price>{product.product_price}</Price>
