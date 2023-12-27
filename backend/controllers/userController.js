@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const itemsPerPage = 30;
 const jwt = require('jsonwebtoken');
-const generateToken = require('../../frontend/src/constants/JWT');
+const generateToken = require('../middleware/JWT');
 
 const userController = {
     add: (req, res) => {
