@@ -1,7 +1,8 @@
 import { getAuthToken, setAuthToken } from './constants/utils';//引入 token
 import axios from 'axios';
 
-const baseURL = 'http://localhost:5001/api'; // 設定後端埠口號
+//const baseURL = 'http://localhost:5001/api'; // 設定後端埠口號
+const baseURL = 'https://homographs-backend-497c2e6eca4b.herokuapp.com/api';
 
 export const fetchCarouselData = async () => {
     try {
