@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/cuckoo123321/homographs/static/css/main.f96f07a4.css",
+    "main.js": "/cuckoo123321/homographs/static/js/main.68a25061.js",
+    "index.html": "/cuckoo123321/homographs/index.html",
+    "main.f96f07a4.css.map": "/cuckoo123321/homographs/static/css/main.f96f07a4.css.map",
+    "main.68a25061.js.map": "/cuckoo123321/homographs/static/js/main.68a25061.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f96f07a4.css",
+    "static/js/main.68a25061.js"
+  ]
+}
