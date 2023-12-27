@@ -56,5 +56,5 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "sass": "^1.69.5"
   },
-  "homepage": "https://github.com/cuckoo123321/homographs"
+  "homepage": "https://cuckoo123321.github.io/homographs"
 }
