@@ -141,8 +141,7 @@ export default function AboutPage() {
     <Root>
       <Title><h1>歡迎光臨本網站 - 中日同形詞的奇幻世界</h1></Title>
       
-      <Container>
-      {imageDescriptionS && <MonsterS>{imageDescriptionS}</MonsterS>}
+      <Container>      
          <Image 
          src={currentImageS}  
          alt="小怪獸S-2"
@@ -150,7 +149,7 @@ export default function AboutPage() {
          onMouseEnter={handleMouseEnterS}
          onMouseLeave={handleMouseLeave}
          />
-          
+        {imageDescriptionS && <MonsterS>{imageDescriptionS}</MonsterS>}  
         <Paragraph style={{ paddingLeft: '30px' }}>
             本網站是由《實用中日同形詞攻略法》的作者所開發而成，旨在向大家推廣這本實用的書籍，同時介紹其他華語教學相關的書籍、研討會和工作坊活動。希望這些資源能對語言學習者、教學者帶來一些幫助。
         </Paragraph>
@@ -172,8 +171,7 @@ export default function AboutPage() {
         />
       </Container>
       
-      <Container>
-      {imageDescriptionD && <MonsterD>{imageDescriptionD}</MonsterD>}
+      <Container>      
       <Image 
         src={currentImageD} 
         alt="小怪獸D-4"
@@ -181,6 +179,7 @@ export default function AboutPage() {
         onMouseEnter={handleMouseEnterD}
         onMouseLeave={handleMouseLeave}
       />
+      {imageDescriptionD && <MonsterD>{imageDescriptionD}</MonsterD>}
         <Paragraph style={{ paddingLeft: '30px' }}>
         此外，如果您對相關研究有興趣，本站提供期刊文章<a href="https://www.airitilibrary.com/Article/Detail/18118429-202006-202006300008-202006300008-1-40" style={{textDecoration: 'none'}}>〈中日同形詞自學式教材對初級日籍學習者詞彙學習成效之影響〉</a>，歡迎探索深入了解。這篇文章透過實驗，深入探討了使用「中日同形詞」教材與未使用該教材的學習者，在詞彙方面的學習成效差異。同時收錄作者的相關著作：
         <a href="https://www.degruyter.com/document/doi/10.1515/caslar-2021-2005/html" style={{textDecoration: 'none'}}>〈漢語移動事件中「來」與「過來」之探究〉</a>、
