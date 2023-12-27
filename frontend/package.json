@@ -13,6 +13,7 @@
     "axios": "^1.6.2",
     "bootstrap": "^5.3.2",
     "bootstrap-icons": "^1.11.2",
+    "gh-pages": "^6.1.1",
     "jsonwebtoken": "^9.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -29,7 +30,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "compile-sass": "sass input.scss output.css"
+    "compile-sass": "sass input.scss output.css",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -52,6 +55,6 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "sass": "^1.69.5"
-  }, 
-  "homepage": ""
+  },
+  "homepage": "https://github.com/cuckoo123321/homographs"
 }
